@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로텍(053610) 종합 분석 리포트 | 2026.05.18</title>
+<style>
+  :root {
+    --primary: #0a2540;
+    --accent: #2c7be5;
+    --gold: #c9a050;
+    --positive: #d63333;
+    --negative: #0066cc;
+    --neutral: #6c757d;
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-sub: #555;
+    --border: #e0e6ed;
+    --warning: #ff9800;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, #163a5f 100%);
+    color: #fff;
+    padding: 24px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(10,37,64,0.15);
+  }
+  header .title { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  header .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; font-size: 12px; }
+  header .meta span { background: rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; }
+
+  /* Live Quote Strip */
+  .quote-strip {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    border-top: 4px solid var(--negative);
+  }
+  .quote-strip .price-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+  .quote-strip .price { font-size: 28px; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
+  .quote-strip .change { font-size: 15px; font-weight: 700; color: var(--negative); }
+  .quote-strip .ohlc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; font-size: 12px; color: var(--text-sub); }
+  .quote-strip .ohlc div { background: #f8fafc; padding: 6px 8px; border-radius: 4px; }
+  .quote-strip .ohlc strong { display: block; color: var(--primary); font-size: 13px; }
+
+  /* Rating Box */
+  .rating-box {
+    background: var(--card-bg);
+    border-left: 5px solid var(--gold);
+    padding: 18px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .rating-box h2 {
+    font-size: 14px; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .rating-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .rating-item {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #fafbfc;
+  }
+  .rating-item .label { font-size: 11px; color: var(--text-sub); }
+  .rating-item .value { font-size: 17px; font-weight: 700; color: var(--primary); margin-top: 4px; }
+  .rating-item .value.buy { color: var(--positive); }
+  .rating-item .value.hold { color: var(--warning); }
+
+  /* Section card */
+  .section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--primary);
+  }
+  .section-header .badge {
+    background: var(--primary); color: #fff;
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .section-header .badge.gs { background: #7d6133; }
+  .section-header .badge.ms { background: #1e3d6f; }
+  .section-header .badge.summary { background: var(--positive); }
+  .section-header h2 { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+  .section h3 {
+    font-size: 15px; color: var(--primary);
+    margin: 18px 0 8px;
+    padding-left: 10px;
+    border-left: 3px solid var(--accent);
+  }
+  .section p { font-size: 14px; color: var(--text); margin-bottom: 10px; }
+  .section ul { margin: 8px 0 12px 18px; }
+  .section li { font-size: 14px; margin-bottom: 6px; line-height: 1.55; }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px; min-width: 480px;
+  }
+  th, td {
+    padding: 9px 10px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: #f0f4f8; color: var(--primary);
+    font-weight: 600; font-size: 12px;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: -apple-system, "SF Mono", monospace; }
+  tr:last-child td { border-bottom: none; }
+  td.pos { color: var(--positive); font-weight: 600; }
+  td.neg { color: var(--negative); font-weight: 600; }
+  tr.highlight { background: #fffbe6; }
+
+  /* Scenario boxes */
+  .scenarios { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 14px; }
+  @media (min-width: 600px) { .scenarios { grid-template-columns: 1fr 1fr; } }
+  .scenario {
+    border-radius: 8px; padding: 14px;
+    border: 1px solid var(--border);
+  }
+  .scenario.bull { background: linear-gradient(180deg, #fff5f5 0%, #fff 100%); border-color: #ffd6d6; }
+  .scenario.bear { background: linear-gradient(180deg, #f0f7ff 0%, #fff 100%); border-color: #c5dcfb; }
+  .scenario h4 { font-size: 14px; margin-bottom: 8px; }
+  .scenario.bull h4 { color: var(--positive); }
+  .scenario.bear h4 { color: var(--negative); }
+  .scenario .target { font-size: 22px; font-weight: 700; margin: 6px 0; }
+  .scenario.bull .target { color: var(--positive); }
+  .scenario.bear .target { color: var(--negative); }
+  .scenario p { font-size: 13px; margin-bottom: 4px; }
+
+  /* Tech indicators */
+  .indicators {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .indicator {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 6px;
+  }
+  .indicator .name { font-size: 11px; color: var(--text-sub); margin-bottom: 4px; }
+  .indicator .reading { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .indicator .interp { font-size: 11px; margin-top: 4px; }
+  .interp.bull { color: var(--positive); }
+  .interp.bear { color: var(--negative); }
+  .interp.neut { color: var(--neutral); }
+
+  /* Trade plan */
+  .trade-plan {
+    background: linear-gradient(135deg, #fff8e8 0%, #fffef5 100%);
+    border: 1px solid #e8d49a;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .trade-plan h4 { color: #8a6914; margin-bottom: 10px; }
+  .plan-row {
+    display: flex; justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px dashed #e8d49a;
+    font-size: 13px;
+  }
+  .plan-row:last-child { border: none; }
+  .plan-row .label { color: var(--text-sub); }
+  .plan-row .val { font-weight: 700; }
+
+  /* Alert callout */
+  .callout {
+    background: #fff3cd;
+    border-left: 4px solid var(--warning);
+    padding: 12px 14px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #856404;
+  }
+  .callout.danger { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+  .callout.info { background: #d1ecf1; border-color: #17a2b8; color: #0c5460; }
+
+  /* Conclusion */
+  .verdict {
+    background: linear-gradient(135deg, var(--primary) 0%, #1a3a5c 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+  }
+  .verdict h3 { color: #ffd56b; border: none; padding: 0; }
+  .verdict .stars { font-size: 20px; color: #ffd56b; margin: 8px 0; }
+  .verdict p { color: #fff; font-size: 14px; }
+
+  /* Risk badge */
+  .risk-tag {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 4px; font-size: 11px;
+    font-weight: 600; margin-right: 4px;
+  }
+  .risk-tag.low { background: #d4edda; color: #155724; }
+  .risk-tag.med { background: #fff3cd; color: #856404; }
+  .risk-tag.high { background: #f8d7da; color: #721c24; }
+
+  /* Sources */
+  .sources {
+    background: #f0f4f8;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    font-size: 12px;
+  }
+  .sources h3 { font-size: 13px; padding-left: 0; border-left: none; color: var(--primary); margin-bottom: 8px; }
+  .sources ul { list-style: none; margin: 0; padding: 0; }
+  .sources li { margin: 4px 0; word-break: break-all; }
+  .sources a { color: var(--accent); text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+
+  footer {
+    text-align: center; font-size: 11px;
+    color: var(--text-sub); padding: 16px 0;
+  }
+  .disclaimer {
+    background: #fff3cd; color: #856404;
+    padding: 10px 14px; border-radius: 6px;
+    font-size: 12px; margin-bottom: 18px;
+    border-left: 3px solid var(--warning);
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 600px) {
+    .container { padding: 12px; }
+    header { padding: 18px 16px; }
+    header .title { font-size: 18px; }
+    .section { padding: 18px 16px; }
+    .section-header h2 { font-size: 16px; }
+    .rating-box { padding: 14px 16px; }
+    .quote-strip .price { font-size: 24px; }
+    .quote-strip .ohlc { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="title">프로텍 (053610) 종합 분석 리포트</div>
+    <div class="subtitle">기술적 분석 + 펀더멘털 분석 | KOSDAQ · 반도체 후공정 장비</div>
+    <div class="meta">
+      <span>📅 작성일: 2026-05-18</span>
+      <span>🏢 KOSDAQ · 053610</span>
+      <span>📊 차트 기준일: 2026-05-15</span>
+    </div>
+  </header>
+
+  <!-- Live Quote Strip (Chart-based) -->
+  <div class="quote-strip">
+    <div class="price-row">
+      <span class="price">82,700원</span>
+      <span class="change">▼ 6,000원 (-6.76%)</span>
+      <span style="color:var(--text-sub); font-size:12px;">2026-05-15 종가 기준</span>
+    </div>
+    <div class="ohlc">
+      <div><strong>89,900</strong>시가 (+0.55%)</div>
+      <div><strong>92,800</strong>고가 (+3.80%)</div>
+      <div><strong>79,700</strong>저가 (-10.85%)</div>
+      <div><strong>82,700</strong>종가 (-7.49%)</div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    ⚠️ 본 자료는 공개 정보 및 차트 데이터를 바탕으로 한 분석 시뮬레이션이며, 투자 권유가 아닙니다. 최종 투자 판단은 본인 책임입니다.
+  </div>
+
+  <!-- Summary Rating Box -->
+  <div class="rating-box">
+    <h2>★ Executive Summary</h2>
+    <div class="rating-grid">
+      <div class="rating-item">
+        <div class="label">투자의견 (펀더멘털)</div>
+        <div class="value buy">매수 (BUY)</div>
+      </div>
+      <div class="rating-item">
+        <div class="label">기술적 신호 (단기)</div>
+        <div class="value hold">조정 진행 중</div>
+      </div>
+      <div class="rating-item">
+        <div class="label">12M 목표주가</div>
+        <div class="value">110,000원</div>
+      </div>
+      <div class="rating-item">
+        <div class="label">상승여력</div>
+        <div class="value">약 +33%</div>
+      </div>
+      <div class="rating-item">
+        <div class="label">확신 수준</div>
+        <div class="value">중상 (Medium-High)</div>
+      </div>
+    </div>
+    <div class="callout">
+      📌 <strong>차트 핵심 포인트</strong>: 2025.11.05 저점 29,000원 → 2026.05.08 고점 <strong>93,500원 (+185%)</strong> 폭등 후 단기 -11.55% 조정 중. 거래량 폭증과 함께 5월 15일 -7.49% 큰 음봉 출현으로 단기 조정 국면 진입.
+    </div>
+  </div>
+
+  <!-- =================== METHOD 1: GOLDMAN SACHS FUNDAMENTAL =================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge gs">방법 1</span>
+      <h2>골드만 삭스 펀더멘털 분석</h2>
+    </div>
+
+    <h3>1. 비즈니스 모델</h3>
+    <p>프로텍은 1997년 설립된 반도체 후공정 패키지 공정장비 전문 제조사입니다. <strong>디스펜서, 다이본더, 레이저 본더(LAB), 반송 자동화</strong> 등을 핵심 제품으로 보유하며, 매출의 약 62%가 반도체·SMT·LED용 제조기계에서 발생합니다. 주요 고객사는 삼성전자, SK하이닉스, 앰코테크놀로지, ASE 등 글로벌 OSAT/IDM이며, AI 반도체 패키징 사이클의 수혜주로 자리매김하고 있습니다.</p>
+
+    <h3>2. 수익원 분석</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>세그먼트</th><th>매출 비중</th><th>성장 궤적</th></tr></thead>
+        <tbody>
+          <tr><td>반도체 후공정 장비</td><td class="num">~62%</td><td class="pos">고성장 (AI/HBM 수혜)</td></tr>
+          <tr><td>레이저 본더 (LAB)</td><td class="num">신규/확대</td><td class="pos">폭발적 성장</td></tr>
+          <tr><td>SMT/LED 장비</td><td class="num">~25%</td><td>안정</td></tr>
+          <tr><td>유공압 펌프 등 기타</td><td class="num">~13%</td><td>안정</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3. 수익성 분석 (연결 기준)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>항목</th><th>2024</th><th>2025</th><th>2026E</th></tr></thead>
+        <tbody>
+          <tr><td>매출액 (억원)</td><td class="num">~1,700</td><td class="num">2,302</td><td class="num pos">2,571</td></tr>
+          <tr><td>YoY 성장률</td><td class="num">-</td><td class="num pos">+35.4%</td><td class="num pos">+11.7%</td></tr>
+          <tr><td>영업이익 (억원)</td><td class="num">~135</td><td class="num">462</td><td class="num pos">576</td></tr>
+          <tr><td>YoY 성장률</td><td class="num">-</td><td class="num pos">+244.5%</td><td class="num pos">+24.6%</td></tr>
+          <tr><td>영업이익률</td><td class="num">~8%</td><td class="num">20.1%</td><td class="num pos">22.4%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>2025년부터 영업이익률이 8% → 20%대로 <strong>구조적 레벨업</strong> 진행. 2026년 22%대 마진으로 추가 확대 전망 — 고부가 레이저 본더 비중 확대에 기인.</p>
+
+    <h3>4. 대차대조표 건전성</h3>
+    <ul>
+      <li><strong>부채비율</strong>: 약 20~30% 수준으로 매우 보수적</li>
+      <li><strong>현금성 자산</strong>: 풍부한 순현금 포지션 (자사주 소각 재원 활용)</li>
+      <li><strong>유동비율</strong>: 200% 이상, 단기 지급능력 우수</li>
+      <li><strong>차입금</strong>: 거의 무차입 경영 (이자보상배율 매우 높음)</li>
+    </ul>
+
+    <h3>5. 자유현금흐름 & 자본 배분</h3>
+    <p>2025년부터 영업현금흐름이 크게 개선되며 FCF 창출력 강화. <strong>2026.5.4 자사주 200만주(발행주식의 18.2%) 소각 완료</strong>로 EPS 5,642원 → 6,896원으로 +22.2% 상승 효과. 강력한 주주환원 정책이 진행 중.</p>
+
+    <h3>6. 경쟁 우위 (해자 분석, 1-10점)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>경쟁 요소</th><th>점수</th><th>코멘트</th></tr></thead>
+        <tbody>
+          <tr><td>기술력 (특허/노하우)</td><td class="num"><strong>9/10</strong></td><td>레이저 본더 국산화, IR 레이저 하부조사 기술</td></tr>
+          <tr><td>가격 결정력</td><td class="num"><strong>7/10</strong></td><td>고객 검증 통과로 협상력 강화</td></tr>
+          <tr><td>전환 비용</td><td class="num"><strong>8/10</strong></td><td>장비 검증·라인 통합 비용 높음</td></tr>
+          <tr><td>네트워크 효과</td><td class="num"><strong>5/10</strong></td><td>OSAT 레퍼런스 확보로 점진적 강화</td></tr>
+          <tr><td>브랜드 강도</td><td class="num"><strong>6/10</strong></td><td>중소형 장비 시장 내 인지도 우수</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>7. 경영진 품질</h3>
+    <p>창업자 일가 중심의 안정적 지배구조. <strong>자사주 매입 후 소각</strong>이라는 적극적 자본 배분 정책을 실행 중이며, 무차입 경영과 보수적 재무 운용으로 신뢰도 높음.</p>
+
+    <h3>8. 밸류에이션 스냅샷 (현재가 82,700원 기준)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>지표</th><th>현재</th><th>5년 평균</th><th>섹터 평균</th><th>판단</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>PER (12M Fwd, EPS 6,896)</td><td class="num"><strong>~12.0배</strong></td><td class="num">~15배</td><td class="num">~18배</td><td class="pos">저평가</td></tr>
+          <tr><td>PBR</td><td class="num">~2.3배</td><td class="num">~1.3배</td><td class="num">~2.5배</td><td>적정</td></tr>
+          <tr><td>EV/EBITDA</td><td class="num">~9배</td><td class="num">~10배</td><td class="num">~12배</td><td>적정~저평가</td></tr>
+          <tr><td>배당수익률</td><td class="num">~1.0%</td><td class="num">~1.0%</td><td class="num">~0.8%</td><td>양호</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--text-sub);">※ 단, 6개월 만에 +185% 급등으로 PER가 9.7배에서 12배로 재평가됨. AI 후공정 슈퍼사이클 프리미엄을 반영해도 여전히 동종 대비 매력적.</p>
+
+    <h3>9. 시나리오 분석 (12개월 목표주가)</h3>
+    <div class="scenarios">
+      <div class="scenario bull">
+        <h4>▲ 강세 시나리오 (Bull Case)</h4>
+        <div class="target">125,000원 ~ 140,000원</div>
+        <p>• AI 가속기/HBM 수요 폭증으로 레이저 본더 양산 본격화</p>
+        <p>• ASE 외 글로벌 OSAT 대규모 추가 수주</p>
+        <p>• 영업이익률 25%+ 도달</p>
+        <p>• Target P/E 18~20배 × EPS 7,000원</p>
+      </div>
+      <div class="scenario bear">
+        <h4>▼ 약세 시나리오 (Bear Case)</h4>
+        <div class="target">55,000원 ~ 65,000원</div>
+        <p>• AI 투자 사이클 둔화·고객 CAPEX 지연</p>
+        <p>• 환율·원가 부담 확대</p>
+        <p>• 후공정 경쟁사 진입 가속</p>
+        <p>• Target P/E 8~9배 × EPS 6,500원</p>
+      </div>
+    </div>
+
+    <h3>10. 펀더멘털 결론</h3>
+    <p style="background:#fff8e8;padding:14px;border-radius:8px;border-left:4px solid var(--gold);">
+    <strong>투자의견: 매수 (BUY)</strong> · 12개월 목표주가 <strong>110,000원</strong> (상승여력 ~+33%) · 확신 수준 <strong>중상 (Medium-High)</strong>.
+    AI 반도체 후공정 패키징 슈퍼사이클의 직접 수혜주로, 레이저 본더의 국산화와 글로벌 OSAT 레퍼런스 확보가 핵심 모멘텀. 자사주 18.2% 소각으로 EPS 구조적 점프, P/E 12배는 25%+ 이익 성장률 대비 매력적. 단, 단기 +185% 급등 이후 일부 차익실현 매물이 출회 중이므로 분할 매수 권고.
+    </p>
+  </div>
+
+  <!-- =================== METHOD 2: MORGAN STANLEY TECHNICAL =================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge ms">방법 2</span>
+      <h2>모건 스탠리 기술적 분석 (차트 기반)</h2>
+    </div>
+
+    <div class="callout info">
+      📊 <strong>차트 데이터 요약 (2026-05-15 기준)</strong>: 시가 89,900 / 고가 92,800 / 저가 79,700 / <strong>종가 82,700</strong> / 전일대비 -7.49%. 거래량 215.17K (20일 평균 152.00K의 1.42배). 2025.11.05 저점 29,000 → 2026.05.08 고점 93,500 (+185.17%).
+    </div>
+
+    <h3>1. 추세 분석 (Multi-timeframe)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>시간대</th><th>추세</th><th>판단</th></tr></thead>
+        <tbody>
+          <tr><td>일간 (Daily)</td><td>고점 후 단기 조정 진행</td><td class="neg">단기 약세</td></tr>
+          <tr><td>주간 (Weekly)</td><td>중기 상승추세 유효</td><td class="pos">강한 상승</td></tr>
+          <tr><td>월간 (Monthly)</td><td>2025년 11월부터 폭등 사이클</td><td class="pos">매우 강한 상승</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>차트상 2025.11.05 저점 29,000원에서 단 6개월 만에 93,500원까지 <strong>+185% 폭등</strong>. 5월 15일 -7.49% 큰 음봉으로 단기 차익실현 출회. 그러나 중장기 상승추세 자체는 훼손되지 않은 상태.</p>
+
+    <h3>2. 지지·저항 (차트 기준 Key Levels)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구분</th><th>가격대</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr><td class="pos">3차 저항</td><td class="num">100,000원</td><td>심리적 라운드 + 향후 목표권</td></tr>
+          <tr><td class="pos">2차 저항</td><td class="num">93,500원</td><td>2026.05.08 전고점</td></tr>
+          <tr><td class="pos">1차 저항</td><td class="num">88,000~90,000원</td><td>5월 직전 박스 중심</td></tr>
+          <tr class="highlight"><td><strong>현재가</strong></td><td class="num"><strong>82,700원</strong></td><td>일목 후행스팬과 동일</td></tr>
+          <tr><td class="neg">1차 지지</td><td class="num">79,700~80,000원</td><td>5/15 저가 + 심리적 지지</td></tr>
+          <tr><td class="neg">2차 지지</td><td class="num">73,000~75,000원</td><td>일목 기준선 73,050 + 20일선 추정</td></tr>
+          <tr><td class="neg">3차 지지</td><td class="num">63,000~65,000원</td><td>60일선 + 38.2% 피보나치</td></tr>
+          <tr><td class="neg">4차 지지</td><td class="num">53,000~55,000원</td><td>일목 구름대 상단 (선행스팬1 54,725)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3. 이동평균선 (차트 정배열 확인)</h3>
+    <div class="indicators">
+      <div class="indicator">
+        <div class="name">5일 이평선</div>
+        <div class="reading">~88,000원</div>
+        <div class="interp neut">주가 하회 (단기 약세)</div>
+      </div>
+      <div class="indicator">
+        <div class="name">20일 이평선</div>
+        <div class="reading">~80,000원</div>
+        <div class="interp bull">주가 부근 지지</div>
+      </div>
+      <div class="indicator">
+        <div class="name">60일 이평선</div>
+        <div class="reading">~65,000원</div>
+        <div class="interp bull">정배열 (강한 상승)</div>
+      </div>
+      <div class="indicator">
+        <div class="name">120일 이평선</div>
+        <div class="reading">~50,000원</div>
+        <div class="interp bull">대형 상승 (정배열)</div>
+      </div>
+    </div>
+    <p><strong>정배열 유지(Golden Alignment)</strong>: 5 > 20 > 60 > 120일선 순서 유지. 단기적으로 5일선 이탈은 발생했으나 20일선이 1차 지지 역할. 60일·120일선이 흔들리지 않는 한 중장기 추세 전환은 아님.</p>
+
+    <h3>4. 일목균형표 (Ichimoku Cloud) 분석</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>구성요소</th><th>값</th><th>해석</th></tr></thead>
+        <tbody>
+          <tr><td>전환선 (Tenkan)</td><td class="num">84,850원</td><td>주가 약간 상회 = 단기 약세 신호</td></tr>
+          <tr><td>기준선 (Kijun)</td><td class="num">73,050원</td><td>중기 핵심 지지선</td></tr>
+          <tr><td>후행스팬 (Chikou)</td><td class="num">82,700원</td><td>주가와 동일선상</td></tr>
+          <tr><td>선행스팬 1</td><td class="num">54,725원</td><td>구름대 상단 (강한 지지)</td></tr>
+          <tr><td>선행스팬 2</td><td class="num">52,625원</td><td>구름대 하단</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>주가가 <strong>전환선 아래로 일시 이탈</strong>했으나, 기준선(73,050)까지의 거리는 약 12%로 충분한 쿠션 확보. 구름대(53~55K)는 매우 멀리 있어 중장기 상승추세는 강건. 다만 단기 데드크로스(전환선↘기준선) 가능성 대비 필요.</p>
+
+    <h3>5. 모멘텀 지표 (차트 실측)</h3>
+    <div class="indicators">
+      <div class="indicator">
+        <div class="name">RSI (14)</div>
+        <div class="reading">59.74</div>
+        <div class="interp neut">중립권 (과매수 해소)</div>
+      </div>
+      <div class="indicator">
+        <div class="name">RSI Signal (14)</div>
+        <div class="reading">72.17</div>
+        <div class="interp bear">하락 다이버전스 주의</div>
+      </div>
+      <div class="indicator">
+        <div class="name">Stochastic %K</div>
+        <div class="reading">46.53</div>
+        <div class="interp neut">중립 (하락 진행)</div>
+      </div>
+      <div class="indicator">
+        <div class="name">Stochastic %D</div>
+        <div class="reading">70.54</div>
+        <div class="interp bear">데드크로스 발생</div>
+      </div>
+    </div>
+    <p>RSI는 5월 초 70대 후반 과열권에서 59.74로 빠르게 식음. <strong>RSI 본선이 신호선(72.17)을 하향 돌파</strong>한 데드크로스 발생 → 단기 모멘텀 약세 신호. Stochastic도 동일하게 데드크로스(46.53 < 70.54) → 추가 하방 가능성. 다만 둘 다 과매도권(20 이하)은 아니므로 <strong>"눌림목 진행 중"</strong>으로 해석.</p>
+
+    <h3>6. 거래량 분석</h3>
+    <p>5월 15일 거래량 <strong>215.17K vs 20일 평균 152.00K (1.42배)</strong>로 평균 대비 증가. 큰 음봉 + 거래량 증가는 일반적으로 <strong>단기 매도세 우세</strong>를 의미하지만, 5월 8일 고점 부근에서 이미 발생한 거래량 폭증(2.00M 부근) 대비로는 평이한 수준 → 패닉 매도는 아님. 차익실현 + 조정 시그널로 해석.</p>
+
+    <h3>7. 피보나치 되돌림 (29,000원 → 93,500원 기준)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>되돌림</th><th>가격</th><th>현재 위치</th></tr></thead>
+        <tbody>
+          <tr><td>0% (고점)</td><td class="num">93,500원</td><td>최근 전고점</td></tr>
+          <tr class="highlight"><td>23.6%</td><td class="num pos"><strong>78,279원</strong></td><td><strong>현재가 부근 (1차 지지)</strong></td></tr>
+          <tr><td>38.2%</td><td class="num">68,860원</td><td>2차 핵심 지지</td></tr>
+          <tr><td>50.0%</td><td class="num">61,250원</td><td>중간 되돌림</td></tr>
+          <tr><td>61.8%</td><td class="num">53,640원</td><td>최대 후퇴 (구름대 부근)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>현재가 82,700원은 23.6% 되돌림(78,279원) 직전에 위치 → <strong>매우 얕은 조정 단계</strong>. 정상적인 강세장에서는 23.6~38.2% 되돌림이 일반적. 68,860원(38.2%)까지가 "건강한 조정" 범위.</p>
+
+    <h3>8. 차트 패턴 진단</h3>
+    <ul>
+      <li><strong>전체 패턴</strong>: 폭등 후 단기 조정 (Healthy Pullback) — 추세 지속 패턴</li>
+      <li><strong>단기 위험 패턴</strong>: 5/15 큰 음봉 (Bearish Marubozu에 가까움) — 추가 하락 가능성</li>
+      <li><strong>중기 패턴</strong>: 상승 채널 내 정상 작동 중</li>
+    </ul>
+
+    <h3>9. 거래 설정 (Trade Setup) — 차트 기반 정밀 플랜</h3>
+    <div class="trade-plan">
+      <h4>📋 추천 매매 플랜 - 3분할 매수 (단기 조정 활용)</h4>
+      <div class="plan-row"><span class="label">1차 진입가 (관망 권장)</span><span class="val">82,000~83,000원 (현재가, 25% 비중)</span></div>
+      <div class="plan-row"><span class="label">2차 진입가 (핵심)</span><span class="val">73,000~75,000원 (40% 비중, 기준선 지지)</span></div>
+      <div class="plan-row"><span class="label">3차 진입가 (안전)</span><span class="val">63,000~65,000원 (35% 비중, 60일선 + 38.2%)</span></div>
+      <div class="plan-row"><span class="label">손절선 (Stop-loss)</span><span class="val" style="color:var(--negative);">60,000원 일봉 종가 이탈 시</span></div>
+      <div class="plan-row"><span class="label">1차 목표가</span><span class="val" style="color:var(--positive);">93,500원 (전고점, +13%)</span></div>
+      <div class="plan-row"><span class="label">2차 목표가</span><span class="val" style="color:var(--positive);">100,000원 (심리적, +21%)</span></div>
+      <div class="plan-row"><span class="label">3차 목표가</span><span class="val" style="color:var(--positive);">115,000~125,000원 (+39%~+51%)</span></div>
+      <div class="plan-row"><span class="label">손익비 (R/R)</span><span class="val">약 1 : 2.5 (양호)</span></div>
+    </div>
+
+    <h3>10. 기술적 결론</h3>
+    <p style="background:#f0f7ff;padding:14px;border-radius:8px;border-left:4px solid var(--accent);">
+    <strong>단기: 조정 진행 / 중장기: 강세 유지</strong>. 차트는 폭등 후 정상적 차익실현 국면을 보여줌. 5/15 큰 음봉은 주의가 필요하나, 정배열·일목 구름대 멀리 떨어진 상태·60일선 멀리 위 등 추세 훼손 신호는 없음. <strong>현재가 추격 매수는 비권장</strong>하며, 73K(기준선) / 65K(60일선)에서의 분할 매수가 정석. 60,000원 이탈 시 추세 전환 가능성 본격 검토.
+    </p>
+  </div>
+
+  <!-- =================== COMPREHENSIVE VERDICT =================== -->
+  <div class="section">
+    <div class="section-header">
+      <span class="badge summary">종합평가</span>
+      <h2>Final Verdict — 펀더멘털 × 기술적 통합</h2>
+    </div>
+
+    <h3>① 두 분석의 합치점</h3>
+    <ul>
+      <li><strong>중장기 강세 의견 일치</strong>: 펀더멘털 BUY + 기술적 정배열 유지</li>
+      <li><strong>목표가 정합성</strong>: 펀더멘털 목표 110,000원 ↔ 기술적 2~3차 목표 100K~125K 일치</li>
+      <li><strong>핵심 동력 동일</strong>: AI/HBM 후공정 사이클 + 자사주 18.2% 소각 → EPS 점프</li>
+      <li><strong>단기 신중론</strong>: 펀더멘털도 +185% 급등 후 분할 매수 권고 / 기술적도 추격 매수 비권장</li>
+    </ul>
+
+    <h3>② 분석 간 미세한 차이</h3>
+    <ul>
+      <li>펀더멘털은 12배 PER로 여전히 매력적이라고 봄 → 즉시 일부 진입 가능</li>
+      <li>기술적은 RSI/Stochastic 데드크로스 + 큰 음봉으로 <strong>단기 추가 하락 후 진입</strong>이 더 안전하다고 판단</li>
+      <li>결론: <strong>지금 일부, 73K·65K에서 추가</strong>의 분할 진입이 두 분석을 모두 만족</li>
+    </ul>
+
+    <h3>③ 핵심 리스크 매트릭스</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>리스크</th><th>등급</th><th>대응</th></tr></thead>
+        <tbody>
+          <tr><td>+185% 급등 후 차익실현 매물</td><td><span class="risk-tag high">높음</span></td><td>분할 매수 + 추격 매수 금지</td></tr>
+          <tr><td>AI/HBM 투자 사이클 둔화</td><td><span class="risk-tag med">중간</span></td><td>분기 가이던스 모니터링</td></tr>
+          <tr><td>고객사 집중도 (삼성·SK)</td><td><span class="risk-tag med">중간</span></td><td>글로벌 OSAT 수주 확장 체크</td></tr>
+          <tr><td>경쟁사 진입 (한미반도체 등)</td><td><span class="risk-tag high">높음</span></td><td>특허·신규 모델 출시 추적</td></tr>
+          <tr><td>기술적 추세 전환 (60K 이탈)</td><td><span class="risk-tag med">중간</span></td><td>손절 규율 준수</td></tr>
+          <tr><td>환율·원자재 변동</td><td><span class="risk-tag low">낮음</span></td><td>수출 비중 헤지</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>④ 통합 매매 전략 (Action Plan)</h3>
+    <div class="trade-plan">
+      <h4>🎯 통합 포지셔닝 가이드 — 차트 반영 최종판</h4>
+      <div class="plan-row"><span class="label">포지션 크기</span><span class="val">포트폴리오의 3~5% (중형주 비중)</span></div>
+      <div class="plan-row"><span class="label">진입 방식</span><span class="val">3분할 매수 (25%/40%/35%)</span></div>
+      <div class="plan-row"><span class="label">1차 진입 (현재가)</span><span class="val">82,700원 ±2% · 25%</span></div>
+      <div class="plan-row"><span class="label">2차 진입 (핵심)</span><span class="val">73,000~75,000원 · 40%</span></div>
+      <div class="plan-row"><span class="label">3차 진입 (안전)</span><span class="val">63,000~65,000원 · 35%</span></div>
+      <div class="plan-row"><span class="label">손절 (Stop-loss)</span><span class="val" style="color:var(--negative);">60,000원 일봉 종가 이탈</span></div>
+      <div class="plan-row"><span class="label">투자 기간</span><span class="val">6~18개월</span></div>
+      <div class="plan-row"><span class="label">최종 목표가</span><span class="val" style="color:var(--positive);">110,000원 (1년) / 125,000원 (Bull)</span></div>
+      <div class="plan-row"><span class="label">차익 실현 룰</span><span class="val">93.5K·100K·115K에서 1/3씩 분할 매도</span></div>
+    </div>
+
+    <div class="verdict">
+      <h3>💎 최종 종합 결론</h3>
+      <div class="stars">★★★★☆ (4.0 / 5.0)</div>
+      <p><strong>투자등급: BUY · 12개월 목표가: 110,000원 · 상승여력: 약 +33%</strong></p>
+      <p style="margin-top:10px;">
+      프로텍은 AI 반도체 후공정 패키징(레이저 본더) 사이클의 핵심 수혜주로, 6개월간 +185% 폭등이라는 결과로 시장 인정을 받았다. 그러나 5/15 -7.49% 큰 음봉 + RSI·Stochastic 데드크로스로 <strong>단기 조정 국면</strong>에 진입한 상태. 추격 매수는 위험하며, 일목 기준선(73K)과 60일선(65K)에서 분할 매수하는 전략이 정석이다. 펀더멘털은 여전히 P/E 12배로 매력적이고 25%+ 이익성장이 동반되므로 중장기 상승 여력은 충분하다. <strong>60,000원 이탈 시 추세 전환을 인정하고 손절</strong>하는 규율이 필수다.
+      </p>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources">
+    <h3>📚 참고 자료 (Sources)</h3>
+    <ul>
+      <li><a href="https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?gicode=A053610" target="_blank">FnGuide - 프로텍(A053610) Snapshot</a></li>
+      <li><a href="https://file.alphasquare.co.kr/media/pdfs/company-report/_260421%20%ED%94%84%EB%A1%9C%ED%85%8D_%EC%98%A8%EB%9D%BC%EC%9D%B8_%EC%A0%95%ED%99%8D%EC%8B%9D_1387_Online%20report%20_%206_10p_%ED%94%84%EB%A1%9C%ED%85%8D.pdf" target="_blank">AlphaSquare Company Report (2026.4.21)</a></li>
+      <li><a href="https://www.digitaltoday.co.kr/news/articleView.html?idxno=662444" target="_blank">디지털투데이 - 프로텍 자기주식 소각 감자완료</a></li>
+      <li><a href="https://kr.investing.com/equities/protec-co-ltd-chart" target="_blank">Investing.com - 프로텍 차트</a></li>
+      <li><a href="https://m.newsprime.co.kr/section_view.html?no=691395" target="_blank">뉴스프라임 - 차세대 레이저 본더 본격 공급</a></li>
+      <li><a href="https://www.newsis.com/view/NISX20250429_0003158011" target="_blank">뉴시스 - 프로텍, ASE에 AI 반도체향 레이저 본더 공급</a></li>
+      <li><a href="https://www.etnews.com/20240305000182" target="_blank">전자신문 - AI 반도체용 레이저 본더 양산</a></li>
+      <li><a href="https://www.hankyung.com/article/202604282329L" target="_blank">한국경제 - 프로텍 52주 신고가 경신</a></li>
+      <li><a href="https://goinsider.kr/stock/00325112" target="_blank">GoInsider - 프로텍 주가·재무제표·공시</a></li>
+      <li>차트 데이터: 사용자 제공 2026-05-15 일봉 차트 (TradingView 기반)</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>© 2026 종합 분석 리포트 · 골드만 삭스 펀더멘털 + 모건 스탠리 기술적 분석 통합본</p>
+    <p style="margin-top:4px;">본 자료는 교육 및 정보 제공 목적이며, 투자 권유가 아닙니다.</p>
+  </footer>
+</div>
+</body>
+</html>
