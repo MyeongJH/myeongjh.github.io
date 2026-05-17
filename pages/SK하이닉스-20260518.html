@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SK하이닉스 기술적 분석 대시보드 - Morgan Stanley Style</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: #0a0e27;
+    color: #e8eaf0;
+    line-height: 1.7;
+    padding: 30px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+    padding: 30px;
+    border-radius: 12px;
+    border-left: 6px solid #4299e1;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+  .header h1 { font-size: 28px; color: #fff; margin-bottom: 8px; }
+  .header .subtitle { color: #a0b4d2; font-size: 14px; }
+  .firm-tag {
+    display: inline-block;
+    background: #4299e1;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .summary-box {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border: 2px solid #4299e1;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+  .summary-box h2 {
+    color: #63b3ed;
+    margin-bottom: 15px;
+    font-size: 20px;
+    border-bottom: 1px solid #4a5568;
+    padding-bottom: 10px;
+  }
+  .trade-plan-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .trade-cell {
+    background: #1a202c;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border-top: 3px solid #4299e1;
+  }
+  .trade-cell .label { font-size: 12px; color: #a0aec0; margin-bottom: 5px; }
+  .trade-cell .value { font-size: 18px; font-weight: bold; color: #fff; }
+  .trade-cell.bullish { border-top-color: #48bb78; }
+  .trade-cell.bearish { border-top-color: #f56565; }
+  .trade-cell.neutral { border-top-color: #ed8936; }
+
+  .section {
+    background: #1a1f3a;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 4px solid #4299e1;
+  }
+  .section h3 {
+    color: #63b3ed;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #4a5568;
+  }
+  .section h3 .num {
+    display: inline-block;
+    background: #4299e1;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #2d3748;
+  }
+  th { background: #2d3748; color: #63b3ed; font-weight: 600; }
+  tr:hover { background: rgba(66, 153, 225, 0.05); }
+  .positive { color: #48bb78; font-weight: bold; }
+  .negative { color: #f56565; font-weight: bold; }
+  .neutral { color: #ed8936; font-weight: bold; }
+  .signal-bull { background: #48bb78; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+  .signal-bear { background: #f56565; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+  .signal-neutral { background: #ed8936; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+  .price { font-family: 'Consolas', monospace; font-weight: bold; }
+  ul { padding-left: 20px; margin-top: 10px; }
+  ul li { margin-bottom: 8px; }
+  .conclusion-box {
+    background: linear-gradient(135deg, #744210 0%, #d69e2e 100%);
+    color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 25px;
+  }
+  .conclusion-box h2 { margin-bottom: 15px; }
+  .meta-info {
+    color: #a0aec0;
+    font-size: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #2d3748;
+    text-align: center;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  .indicator-card {
+    background: #2d3748;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  .indicator-card .name { color: #a0aec0; font-size: 13px; margin-bottom: 5px; }
+  .indicator-card .val { font-size: 22px; font-weight: bold; color: #fff; }
+  .indicator-card .desc { font-size: 12px; color: #cbd5e0; margin-top: 5px; }
+
+  /* Goldman Sachs Section */
+  .gs-divider {
+    background: linear-gradient(135deg, #5c2c0c 0%, #b7791f 100%);
+    padding: 25px;
+    border-radius: 12px;
+    margin: 40px 0 25px 0;
+    text-align: center;
+    border-left: 6px solid #f6ad55;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+  .gs-divider h1 { color: #fff; font-size: 24px; }
+  .gs-divider .firm-tag2 {
+    display: inline-block;
+    background: #f6ad55;
+    color: #1a202c;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .rating-box {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border: 2px solid #f6ad55;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+  .rating-box h2 { color: #f6ad55; margin-bottom: 15px; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
+  .rating-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .rating-cell {
+    background: #1a202c;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border-top: 3px solid #f6ad55;
+  }
+  .rating-cell .label { font-size: 12px; color: #a0aec0; margin-bottom: 5px; }
+  .rating-cell .value { font-size: 18px; font-weight: bold; color: #fff; }
+  .gs-section {
+    background: #1a1f3a;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-left: 4px solid #f6ad55;
+  }
+  .gs-section h3 { color: #f6ad55; font-size: 18px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px dashed #4a5568; }
+  .gs-section h3 .num {
+    display: inline-block;
+    background: #f6ad55;
+    color: #1a202c;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 14px;
+  }
+  .moat-bar {
+    background: #2d3748;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 5px 0;
+    position: relative;
+    height: 28px;
+  }
+  .moat-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f6ad55, #ed8936);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: #1a202c;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .gs-conclusion {
+    background: linear-gradient(135deg, #22543d 0%, #38a169 100%);
+    color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 25px;
+  }
+  .gs-conclusion h2 { margin-bottom: 15px; }
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .scenario-card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .scenario-bull {
+    background: linear-gradient(135deg, #22543d 0%, #2f855a 100%);
+    border-left: 4px solid #48bb78;
+  }
+  .scenario-bear {
+    background: linear-gradient(135deg, #742a2a 0%, #9b2c2c 100%);
+    border-left: 4px solid #f56565;
+  }
+  .scenario-card h4 { font-size: 16px; margin-bottom: 10px; }
+  .scenario-card .price-target {
+    font-size: 26px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  /* Trade Setup — Desktop / Mobile switch */
+  .trade-setup-desktop { display: block; }
+  .trade-setup-mobile { display: none; }
+  .trade-card {
+    background: #2d3748;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-left: 4px solid #4299e1;
+  }
+  .trade-card-header {
+    background: #1a202c;
+    padding: 12px 14px;
+    font-weight: bold;
+    border-bottom: 1px solid #4a5568;
+  }
+  .trade-card-body { padding: 8px 14px; }
+  .trade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px dashed #4a5568;
+    font-size: 13px;
+  }
+  .trade-row:last-child { border-bottom: none; }
+  .trade-label {
+    color: #a0aec0;
+    font-weight: 600;
+    flex-shrink: 0;
+    min-width: 70px;
+  }
+  .trade-val {
+    color: #fff;
+    text-align: right;
+    font-weight: 500;
+    word-break: break-word;
+  }
+
+  /* Mobile Responsive Design */
+  @media (max-width: 768px) {
+    .trade-setup-desktop { display: none; }
+    .trade-setup-mobile { display: block; }
+    body { padding: 12px; }
+    .container { max-width: 100%; }
+    .header { padding: 18px; }
+    .header h1 { font-size: 20px; }
+    .header .subtitle { font-size: 12px; }
+    .summary-box, .rating-box { padding: 15px; }
+    .summary-box h2, .rating-box h2 { font-size: 17px; }
+    .trade-plan-grid, .rating-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .trade-cell, .rating-cell { padding: 10px; }
+    .trade-cell .value, .rating-cell .value { font-size: 14px; }
+    .trade-cell .label, .rating-cell .label { font-size: 11px; }
+    .section, .gs-section { padding: 15px; }
+    .section h3, .gs-section h3 { font-size: 15px; }
+    .section h3 .num, .gs-section h3 .num {
+      width: 22px; height: 22px; line-height: 22px; font-size: 12px; margin-right: 6px;
+    }
+    table { font-size: 12px; }
+    th, td { padding: 6px 5px; }
+    .grid-2, .scenario-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .conclusion-box, .gs-conclusion { padding: 18px; }
+    .conclusion-box h2, .gs-conclusion h2 { font-size: 18px; }
+    .conclusion-box p, .gs-conclusion p { font-size: 14px !important; }
+    .gs-divider { padding: 18px; margin: 25px 0 18px 0; }
+    .gs-divider h1 { font-size: 18px; }
+    .indicator-card { padding: 10px; }
+    .indicator-card .val { font-size: 18px; }
+    .scenario-card .price-target { font-size: 22px; }
+    ul { padding-left: 16px; }
+    ul li { font-size: 13px; }
+  }
+  @media (max-width: 480px) {
+    .trade-plan-grid, .rating-grid {
+      grid-template-columns: 1fr;
+    }
+    .header h1 { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <span class="firm-tag">MORGAN STANLEY | TECHNICAL STRATEGY</span>
+    <h1>SK하이닉스 (000660.KS) — 기술적 분석 대시보드</h1>
+    <p class="subtitle">현재가 1,848,000원 | 전일 대비 -122,000원 (-6.19%) | 작성일 2026-05-18</p>
+  </div>
+
+  <!-- 거래 계획 요약 박스 -->
+  <div class="summary-box">
+    <h2>거래 계획 요약 (Trade Plan Summary)</h2>
+    <p style="color: #cbd5e0; margin-bottom: 10px;">
+      <strong style="color:#ed8936;">전체 평가: 강세 추세 내 단기 조정</strong> — 모든 주요 이동평균이 정배열 상태이나, RSI/스토캐스틱이 과매수권에 진입했고 5월 14일 고점(2,021,000원) 이후 의미 있는 거래량을 동반한 하락이 발생. 단기 매수자는 5일선 회복 여부 확인 후 진입 권고.
+    </p>
+    <div class="trade-plan-grid">
+      <div class="trade-cell bullish">
+        <div class="label">진입 (Entry)</div>
+        <div class="value">1,800,000~1,850,000원</div>
+      </div>
+      <div class="trade-cell bearish">
+        <div class="label">손절 (Stop Loss)</div>
+        <div class="value">1,780,000원</div>
+      </div>
+      <div class="trade-cell neutral">
+        <div class="label">1차 목표 (TP1)</div>
+        <div class="value">1,950,000원</div>
+      </div>
+      <div class="trade-cell neutral">
+        <div class="label">2차 목표 (TP2)</div>
+        <div class="value">2,021,000원</div>
+      </div>
+    </div>
+    <p style="color: #a0aec0; font-size: 13px; margin-top: 12px;">
+      ★ <strong>리스크-리워드 비율</strong>: 1:2.2 (1차 목표 기준) | 1:3.4 (2차 목표 기준) | <strong>편향</strong>: 중립 ~ 약세 단기 / 강세 중기
+    </p>
+  </div>
+
+  <!-- 1. 추세 분석 -->
+  <div class="section">
+    <h3><span class="num">1</span>추세 분석 (다중 시간대)</h3>
+    <table>
+      <tr><th>시간대</th><th>방향</th><th>강도</th><th>코멘트</th></tr>
+      <tr>
+        <td>일간 (Daily)</td>
+        <td><span class="signal-bear">단기 조정</span></td>
+        <td>중립</td>
+        <td>전일 -6.19% 갭다운 음봉, 5일선 이탈</td>
+      </tr>
+      <tr>
+        <td>주간 (Weekly)</td>
+        <td><span class="signal-bull">강세 상승</span></td>
+        <td>강함</td>
+        <td>4월 저점 약 1,100,000원에서 +80% 이상 급등 후 조정</td>
+      </tr>
+      <tr>
+        <td>월간 (Monthly)</td>
+        <td><span class="signal-bull">강한 상승</span></td>
+        <td>매우 강함</td>
+        <td>2023.12 저점 대비 약 +250% 누적 상승, 장기 상승 추세 유효</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 2. 지지와 저항 -->
+  <div class="section">
+    <h3><span class="num">2</span>지지와 저항 (Key Levels)</h3>
+    <div class="grid-2">
+      <div>
+        <h4 style="color:#48bb78; margin-bottom:10px;">▼ 지지선 (Support)</h4>
+        <ul>
+          <li><span class="price">1,800,000원</span> — 심리적 지지</li>
+          <li><span class="price">1,789,000원</span> — 당일 저가, 1차 손절 라인</li>
+          <li><span class="price">1,666,500원</span> — 일목 전환선</li>
+          <li><span class="price">1,484,500원</span> — 일목 기준선 / 20일선</li>
+          <li><span class="price">1,130,350원</span> — 60일선 (장기 지지)</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#f56565; margin-bottom:10px;">▲ 저항선 (Resistance)</h4>
+        <ul>
+          <li><span class="price">1,905,000원</span> — 5일선 (단기 회복 트리거)</li>
+          <li><span class="price">1,977,000원</span> — 당일 시가 갭 메우기 구간</li>
+          <li><span class="price">1,995,000원</span> — 당일 고가</li>
+          <li><span class="price">2,000,000원</span> — 심리적 저항 (라운드 넘버)</li>
+          <li><span class="price">2,021,000원</span> — 5월 14일 신고점</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 이동평균 -->
+  <div class="section">
+    <h3><span class="num">3</span>이동평균 분석</h3>
+    <table>
+      <tr><th>이동평균</th><th>현재 수치</th><th>현재가 대비</th><th>신호</th></tr>
+      <tr>
+        <td>5일선 (단기)</td>
+        <td class="price">1,905,000원</td>
+        <td class="negative">-3.0% (하향 이탈)</td>
+        <td><span class="signal-bear">데드크로스 임박</span></td>
+      </tr>
+      <tr>
+        <td>20일선 (중기)</td>
+        <td class="price">1,474,900원</td>
+        <td class="positive">+25.3%</td>
+        <td><span class="signal-bull">상승 추세 유효</span></td>
+      </tr>
+      <tr>
+        <td>60일선 (장기)</td>
+        <td class="price">1,130,350원</td>
+        <td class="positive">+63.5%</td>
+        <td><span class="signal-bull">강한 상승</span></td>
+      </tr>
+      <tr>
+        <td>120일선 (장기)</td>
+        <td class="price">904,483원</td>
+        <td class="positive">+104.3%</td>
+        <td><span class="signal-bull">매우 강한 상승</span></td>
+      </tr>
+    </table>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      ★ <strong>정배열 유지</strong>: 5일&gt;20일&gt;60일&gt;120일 — 다만 5일선 하향 이탈은 단기 모멘텀 둔화 신호. 20일선까지 조정 가능성 열어두어야 함.
+    </p>
+  </div>
+
+  <!-- 4. RSI -->
+  <div class="section">
+    <h3><span class="num">4</span>RSI (14) — 모멘텀 분석</h3>
+    <div class="grid-2">
+      <div class="indicator-card">
+        <div class="name">RSI(14) 현재값</div>
+        <div class="val" style="color:#ed8936;">71.07</div>
+        <div class="desc">과매수 기준선(70) 상회 → 조정 압력</div>
+      </div>
+      <div class="indicator-card">
+        <div class="name">시그널 라인</div>
+        <div class="val" style="color:#f56565;">77.04</div>
+        <div class="desc">RSI &lt; 시그널 → 모멘텀 약화</div>
+      </div>
+    </div>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      해석: RSI가 70 이상 과매수권에서 하락 반전하며 시그널선을 하향 돌파 — <strong>약세 다이버전스 발생</strong>. 추가 조정 가능성 시사.
+    </p>
+  </div>
+
+  <!-- 5. 일목균형표 / 스토캐스틱 -->
+  <div class="section">
+    <h3><span class="num">5</span>일목균형표 & 스토캐스틱</h3>
+    <table>
+      <tr><th>지표</th><th>값</th><th>해석</th></tr>
+      <tr>
+        <td>전환선</td>
+        <td class="price">1,666,500원</td>
+        <td>기준선 위 — 단기 추세 강세 유효</td>
+      </tr>
+      <tr>
+        <td>기준선</td>
+        <td class="price">1,484,500원</td>
+        <td>중기 추세 강세</td>
+      </tr>
+      <tr>
+        <td>선행스팬 1 / 2 (구름대)</td>
+        <td class="price">950,500 / 919,000원</td>
+        <td>주가가 구름대 위 — <span class="signal-bull">강한 매수 영역</span></td>
+      </tr>
+      <tr>
+        <td>스토캐스틱(14,1,3) %K</td>
+        <td class="price">79.11</td>
+        <td>과매수권(80)에서 하락 시작</td>
+      </tr>
+      <tr>
+        <td>스토캐스틱 %D</td>
+        <td class="price">90.48</td>
+        <td><span class="signal-bear">데드크로스 진행</span> — 단기 약세</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 6. 볼린저 밴드 -->
+  <div class="section">
+    <h3><span class="num">6</span>볼린저 밴드 추정 (20, 2σ)</h3>
+    <p style="color:#cbd5e0;">
+      차트에 명시적 표시는 없으나 20일선 1,474,900원 기준으로 추정 시 상단 밴드는 약 2,000,000~2,050,000원 수준. 5월 14일 고점이 상단 밴드에 접근/돌파 후 반락 → <strong>밴드 워킹(band-walking) 종료 신호</strong>. 평균회귀 압력 작용 중.
+    </p>
+  </div>
+
+  <!-- 7. 거래량 -->
+  <div class="section">
+    <h3><span class="num">7</span>거래량 분석</h3>
+    <div class="grid-2">
+      <div class="indicator-card">
+        <div class="name">당일 거래량</div>
+        <div class="val" style="color:#f56565;">13.15M</div>
+        <div class="desc">20일 평균 대비 +52.7%</div>
+      </div>
+      <div class="indicator-card">
+        <div class="name">20일 평균 거래량</div>
+        <div class="val" style="color:#a0aec0;">8.61M</div>
+        <div class="desc">평소 대비 거래량 급증</div>
+      </div>
+    </div>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      ★ <strong>경고 신호</strong>: 하락 캔들에 거래량 증가 — 기관 매도 우려. 다만 1,789,000원 저점에서 일정 부분 매수세 유입 흔적 존재. 다음 1-2거래일 거래량 추이가 추세 방향성 결정의 핵심.
+    </p>
+  </div>
+
+  <!-- 8. 피보나치 -->
+  <div class="section">
+    <h3><span class="num">8</span>피보나치 되돌림 (2026.04 저점 ~ 2026.05.14 고점)</h3>
+    <p style="color:#cbd5e0; margin-bottom:10px;">스윙 저점 약 1,100,000원 → 스윙 고점 2,021,000원 기준</p>
+    <table>
+      <tr><th>되돌림 레벨</th><th>가격</th><th>중요도</th></tr>
+      <tr><td>23.6%</td><td class="price">1,803,800원</td><td>현재가 인접 — 1차 지지 테스트 중</td></tr>
+      <tr><td>38.2%</td><td class="price">1,669,000원</td><td>일목 전환선과 중첩 — 강한 지지</td></tr>
+      <tr><td>50.0%</td><td class="price">1,560,500원</td><td>심리적 중요 레벨</td></tr>
+      <tr><td>61.8%</td><td class="price">1,452,000원</td><td>20일선과 근접 — 핵심 방어선</td></tr>
+    </table>
+  </div>
+
+  <!-- 9. 차트 패턴 -->
+  <div class="section">
+    <h3><span class="num">9</span>차트 패턴 식별</h3>
+    <ul>
+      <li><strong>장대 음봉 (Bearish Engulfing 유사 형태)</strong>: 5월 15일 캔들이 전일 양봉을 대체로 감싸며 강한 매도 신호 발생</li>
+      <li><strong>이중 정점(Double Top) 초기 형성 가능성</strong>: 5월 14일 고점 부근에서 두 번째 정점 형성 후 하락 — 1,780,000원 이탈 시 패턴 확정</li>
+      <li><strong>포물선 상승(Parabolic Move) 종료 신호</strong>: 4월~5월 초 급등 후 변곡점 도달 가능성</li>
+      <li><strong>갭다운(Gap Down)</strong>: 5월 14일 종가 대비 큰 폭의 갭 발생 — 갭 메우기 시도 시 1,977,000원이 1차 저항</li>
+    </ul>
+  </div>
+
+  <!-- 10. 거래 설정 -->
+  <div class="section">
+    <h3><span class="num">10</span>구체적 거래 설정 (Trade Setup)</h3>
+
+    <!-- 데스크탑 테이블 -->
+    <div class="trade-setup-desktop">
+      <table>
+        <tr><th>시나리오</th><th>전략</th><th>진입</th><th>손절</th><th>목표</th><th>R:R</th></tr>
+        <tr>
+          <td><span class="signal-bull">강세 (Long)</span></td>
+          <td>5일선 회복 확인 후 매수</td>
+          <td class="price">1,800,000~1,850,000</td>
+          <td class="price">1,780,000</td>
+          <td class="price">TP1: 1,950,000<br>TP2: 2,021,000</td>
+          <td>1:2.2<br>1:3.4</td>
+        </tr>
+        <tr>
+          <td><span class="signal-bear">약세 (Short)</span></td>
+          <td>1,789,000원 이탈 시 추세 추종</td>
+          <td class="price">1,780,000 이탈</td>
+          <td class="price">1,910,000</td>
+          <td class="price">TP1: 1,666,500<br>TP2: 1,484,500</td>
+          <td>1:0.9<br>1:2.3</td>
+        </tr>
+        <tr>
+          <td><span class="signal-neutral">관망 (Wait)</span></td>
+          <td>1,780,000~1,905,000 박스권 대기</td>
+          <td colspan="3" style="text-align:center;">상하단 돌파/이탈 확정 시까지 신규 진입 보류</td>
+          <td>—</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 모바일 카드 -->
+    <div class="trade-setup-mobile">
+      <div class="trade-card">
+        <div class="trade-card-header"><span class="signal-bull">강세 (Long)</span></div>
+        <div class="trade-card-body">
+          <div class="trade-row"><span class="trade-label">전략</span><span class="trade-val">5일선 회복 확인 후 매수</span></div>
+          <div class="trade-row"><span class="trade-label">진입</span><span class="trade-val price">1,800,000~1,850,000</span></div>
+          <div class="trade-row"><span class="trade-label">손절</span><span class="trade-val price">1,780,000</span></div>
+          <div class="trade-row"><span class="trade-label">목표 1</span><span class="trade-val price">1,950,000 (R:R 1:2.2)</span></div>
+          <div class="trade-row"><span class="trade-label">목표 2</span><span class="trade-val price">2,021,000 (R:R 1:3.4)</span></div>
+        </div>
+      </div>
+
+      <div class="trade-card">
+        <div class="trade-card-header"><span class="signal-bear">약세 (Short)</span></div>
+        <div class="trade-card-body">
+          <div class="trade-row"><span class="trade-label">전략</span><span class="trade-val">1,789,000원 이탈 시 추세 추종</span></div>
+          <div class="trade-row"><span class="trade-label">진입</span><span class="trade-val price">1,780,000 이탈</span></div>
+          <div class="trade-row"><span class="trade-label">손절</span><span class="trade-val price">1,910,000</span></div>
+          <div class="trade-row"><span class="trade-label">목표 1</span><span class="trade-val price">1,666,500 (R:R 1:0.9)</span></div>
+          <div class="trade-row"><span class="trade-label">목표 2</span><span class="trade-val price">1,484,500 (R:R 1:2.3)</span></div>
+        </div>
+      </div>
+
+      <div class="trade-card">
+        <div class="trade-card-header"><span class="signal-neutral">관망 (Wait)</span></div>
+        <div class="trade-card-body">
+          <div class="trade-row"><span class="trade-label">전략</span><span class="trade-val">1,780,000~1,905,000 박스권 대기</span></div>
+          <div class="trade-row" style="border-bottom:none;"><span class="trade-val" style="text-align:left; width:100%; color:#cbd5e0;">상하단 돌파/이탈 확정 시까지 신규 진입 보류</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결론 -->
+  <div class="conclusion-box">
+    <h2>★ 최종 결론 (Morgan Stanley Technical View)</h2>
+    <p style="font-size:16px;">
+      SK하이닉스는 <strong>장기 강한 상승 추세</strong> 내에서 <strong>단기 과매수 해소 조정 국면</strong>에 진입했습니다.
+      모든 핵심 이동평균(20/60/120일)이 정배열이고 일목 구름대 위에서 거래 중이므로 <strong>중장기 추세는 여전히 강세</strong>이나,
+      RSI 과매수 다이버전스, 스토캐스틱 데드크로스, 거래량 동반 음봉, 그리고 5일선 이탈은 단기 조정 압력을 시사합니다.
+    </p>
+    <p style="font-size:16px; margin-top:15px;">
+      <strong>실행 전략</strong>: 1,789,000원 ~ 1,800,000원 지지 확인 시 분할 매수 권고. 1,780,000원 이탈 시 20일선(1,474,900원) 또는 피보나치 38.2%(1,669,000원)까지 조정 가능성 열어두어야 함.
+      신규 진입자는 <strong>5일선 회복(1,905,000원 돌파)</strong>을 매수 트리거로 활용하고, 보유자는 <strong>1,780,000원을 손절선</strong>으로 관리할 것을 추천합니다.
+    </p>
+    <p style="margin-top:15px; font-style:italic;">
+      확신 수준: <strong>중간 (Moderate)</strong> | 시간 지평: <strong>1-3개월</strong> | 편향: <strong>중립 단기 / 강세 중기</strong>
+    </p>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- GOLDMAN SACHS FUNDAMENTAL ANALYSIS SECTION    -->
+  <!-- ============================================== -->
+
+  <div class="gs-divider">
+    <span class="firm-tag2">GOLDMAN SACHS | EQUITY RESEARCH</span>
+    <h1>SK하이닉스 (000660.KS) — 펀더멘털 분석 리서치 노트</h1>
+    <p style="color:#fbd38d; font-size:13px; margin-top:8px;">Senior Equity Analyst | Asset Management Division | 2026-05-18</p>
+  </div>
+
+  <!-- 요약 등급 박스 -->
+  <div class="rating-box">
+    <h2>★ 투자 등급 요약 (Rating Summary)</h2>
+    <div class="rating-grid">
+      <div class="rating-cell">
+        <div class="label">투자 의견</div>
+        <div class="value" style="color:#48bb78;">매수 (BUY)</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">12개월 목표가</div>
+        <div class="value" style="color:#f6ad55;">2,300,000원</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">상승 여력</div>
+        <div class="value" style="color:#48bb78;">+24.5%</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">확신 수준</div>
+        <div class="value" style="color:#f6ad55;">High Conviction</div>
+      </div>
+    </div>
+    <p style="color:#cbd5e0; margin-top:15px; font-size:14px;">
+      <strong>핵심 논거</strong>: HBM(고대역폭 메모리) 글로벌 시장 점유율 1위(50%+)로 AI 가속기 수요 직접 수혜.
+      Nvidia, AMD, Broadcom의 차세대 AI 칩(Blackwell, MI400 시리즈) HBM3E/HBM4 공급 비중 절대 우위.
+      메모리 사이클 강세 + AI 구조적 성장 동시 향유로 2026~2027 EPS 추가 상향 여지.
+    </p>
+  </div>
+
+  <!-- 1. 비즈니스 모델 분석 -->
+  <div class="gs-section">
+    <h3><span class="num">1</span>비즈니스 모델 분석</h3>
+    <p style="color:#cbd5e0;">
+      SK하이닉스는 글로벌 메모리 반도체 시장 점유율 2위 업체(삼성전자에 이어)로,
+      <strong style="color:#f6ad55;">DRAM, NAND, HBM 3대 메모리 제품을 글로벌 빅테크에 공급</strong>합니다.
+      특히 HBM 분야에서는 Nvidia의 단독 1차 공급사 지위를 확보하여, AI 가속기 시장 폭발적 성장의 핵심 수혜주로 부상했습니다.
+      매출의 약 95%가 B2B 기업 고객(서버, 모바일, PC 제조사)에서 발생하며, 상위 5대 고객사(Nvidia, Apple, Microsoft, Samsung, Dell 등)가 매출의 50% 이상을 차지합니다.
+    </p>
+  </div>
+
+  <!-- 2. 수익원 -->
+  <div class="gs-section">
+    <h3><span class="num">2</span>수익원 (Revenue Mix)</h3>
+    <table>
+      <tr><th>세그먼트</th><th>비중</th><th>YoY 성장률</th><th>코멘트</th></tr>
+      <tr>
+        <td><strong>DRAM (HBM 포함)</strong></td>
+        <td>약 65%</td>
+        <td class="positive">+85%</td>
+        <td>HBM이 DRAM 매출의 40%+ 차지, ASP 5배 프리미엄</td>
+      </tr>
+      <tr>
+        <td><strong>NAND Flash</strong></td>
+        <td>약 28%</td>
+        <td class="positive">+45%</td>
+        <td>eSSD(엔터프라이즈 SSD) 강세, 솔리다임 사업 통합</td>
+      </tr>
+      <tr>
+        <td><strong>기타 (CIS, Foundry 등)</strong></td>
+        <td>약 7%</td>
+        <td class="neutral">+10%</td>
+        <td>이미지 센서, 시스템 IC</td>
+      </tr>
+    </table>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      <strong>★ HBM 매출 폭발적 성장</strong>: 2024년 HBM 매출 약 12조원 → 2026E 35조원+ 예상. 회사 영업이익의 60% 이상 HBM에서 발생.
+    </p>
+  </div>
+
+  <!-- 3. 수익성 분석 -->
+  <div class="gs-section">
+    <h3><span class="num">3</span>수익성 분석 (5년 추세)</h3>
+    <table>
+      <tr><th>지표</th><th>2022</th><th>2023</th><th>2024</th><th>2025E</th><th>2026E</th></tr>
+      <tr>
+        <td>총이익률</td>
+        <td>35.4%</td>
+        <td class="negative">7.1%</td>
+        <td class="positive">42.8%</td>
+        <td class="positive">53.5%</td>
+        <td class="positive">55.2%</td>
+      </tr>
+      <tr>
+        <td>영업이익률</td>
+        <td>20.4%</td>
+        <td class="negative">-32.6%</td>
+        <td class="positive">28.5%</td>
+        <td class="positive">42.0%</td>
+        <td class="positive">44.5%</td>
+      </tr>
+      <tr>
+        <td>순이익률</td>
+        <td>16.5%</td>
+        <td class="negative">-26.4%</td>
+        <td class="positive">22.3%</td>
+        <td class="positive">33.8%</td>
+        <td class="positive">36.0%</td>
+      </tr>
+      <tr>
+        <td>ROE</td>
+        <td>10.0%</td>
+        <td class="negative">-12.0%</td>
+        <td class="positive">19.5%</td>
+        <td class="positive">32.5%</td>
+        <td class="positive">33.0%</td>
+      </tr>
+    </table>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      <strong>구조적 변화</strong>: 2023년 메모리 다운사이클 적자 → AI 메모리 수요로 V자 반등. 영업이익률 40%대는 역사적 고점 수준이나 HBM 프리미엄으로 지속 가능성 높음.
+    </p>
+  </div>
+
+  <!-- 4. 대차대조표 -->
+  <div class="gs-section">
+    <h3><span class="num">4</span>대차대조표 건전성</h3>
+    <div class="grid-2">
+      <div class="indicator-card">
+        <div class="name">부채비율 (D/E)</div>
+        <div class="val" style="color:#48bb78;">42%</div>
+        <div class="desc">2023년 65% → 빠른 디레버리징</div>
+      </div>
+      <div class="indicator-card">
+        <div class="name">유동비율</div>
+        <div class="val" style="color:#48bb78;">1.85x</div>
+        <div class="desc">단기 유동성 양호</div>
+      </div>
+      <div class="indicator-card">
+        <div class="name">순부채/EBITDA</div>
+        <div class="val" style="color:#48bb78;">0.6x</div>
+        <div class="desc">투자등급 우량 수준</div>
+      </div>
+      <div class="indicator-card">
+        <div class="name">현금성 자산</div>
+        <div class="val" style="color:#f6ad55;">약 18조원</div>
+        <div class="desc">총부채 22조원 대비 양호</div>
+      </div>
+    </div>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      메모리 사이클 회복과 HBM 슈퍼사이클로 강력한 현금 창출 → CapEx 부담에도 불구하고 재무 건전성 빠르게 개선 중.
+    </p>
+  </div>
+
+  <!-- 5. 자유현금흐름 -->
+  <div class="gs-section">
+    <h3><span class="num">5</span>자유현금흐름 분석</h3>
+    <table>
+      <tr><th>지표</th><th>2024</th><th>2025E</th><th>2026E</th><th>코멘트</th></tr>
+      <tr>
+        <td>영업현금흐름</td>
+        <td class="price">28조원</td>
+        <td class="price">48조원</td>
+        <td class="price">55조원</td>
+        <td>HBM 슈퍼사이클</td>
+      </tr>
+      <tr>
+        <td>CapEx</td>
+        <td class="price">-17조원</td>
+        <td class="price">-25조원</td>
+        <td class="price">-28조원</td>
+        <td>HBM4/M15X 팹 투자</td>
+      </tr>
+      <tr>
+        <td>FCF</td>
+        <td class="positive">11조원</td>
+        <td class="positive">23조원</td>
+        <td class="positive">27조원</td>
+        <td>강한 FCF 창출력</td>
+      </tr>
+      <tr>
+        <td>FCF 수익률</td>
+        <td>1.2%</td>
+        <td>1.7%</td>
+        <td class="positive">2.0%</td>
+        <td>시총 대비 (상승 추세)</td>
+      </tr>
+    </table>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      <strong>자본 배분 우선순위</strong>: ① HBM CapEx (성장 투자) → ② 부채 상환 → ③ 배당 점진 인상 → ④ 자사주 매입 검토.
+    </p>
+  </div>
+
+  <!-- 6. 경쟁 우위 -->
+  <div class="gs-section">
+    <h3><span class="num">6</span>경쟁 우위 (Moat Analysis, 1-10점)</h3>
+    <div style="margin: 10px 0;">
+      <div style="color:#cbd5e0; font-size:13px; margin-bottom:3px;">HBM 기술 리더십</div>
+      <div class="moat-bar"><div class="moat-fill" style="width:95%;">9.5 / 10 — Nvidia HBM3E 단독 공급</div></div>
+    </div>
+    <div style="margin: 10px 0;">
+      <div style="color:#cbd5e0; font-size:13px; margin-bottom:3px;">고객 락인 / 전환 비용</div>
+      <div class="moat-bar"><div class="moat-fill" style="width:90%;">9.0 / 10 — 2~3년 사전 quality check 필요</div></div>
+    </div>
+    <div style="margin: 10px 0;">
+      <div style="color:#cbd5e0; font-size:13px; margin-bottom:3px;">규모의 경제 / 제조 효율</div>
+      <div class="moat-bar"><div class="moat-fill" style="width:85%;">8.5 / 10 — 글로벌 Top 2 메모리 제조사</div></div>
+    </div>
+    <div style="margin: 10px 0;">
+      <div style="color:#cbd5e0; font-size:13px; margin-bottom:3px;">진입 장벽 (CapEx, R&D)</div>
+      <div class="moat-bar"><div class="moat-fill" style="width:90%;">9.0 / 10 — 신규 진입자 사실상 불가</div></div>
+    </div>
+    <div style="margin: 10px 0;">
+      <div style="color:#cbd5e0; font-size:13px; margin-bottom:3px;">가격 결정력</div>
+      <div class="moat-bar"><div class="moat-fill" style="width:75%;">7.5 / 10 — HBM 강함 / 범용 DRAM 사이클 의존</div></div>
+    </div>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      <strong>종합 Moat 점수: 8.8 / 10</strong> — Wide Moat. AI 메모리 1위 위상은 향후 3-5년 강화 예상.
+    </p>
+  </div>
+
+  <!-- 7. 경영진 -->
+  <div class="gs-section">
+    <h3><span class="num">7</span>경영진 품질</h3>
+    <ul>
+      <li><strong>곽노정 대표이사 (CEO)</strong>: 엔지니어 출신, 2022년 취임 후 HBM 사업 폭발적 성장 견인. 메모리 사이클 다운턴 대응 + AI 메모리 베팅 모두 성공적 실행</li>
+      <li><strong>자본 배분 실적</strong>: 솔리다임(인텔 NAND) 인수 후 통합 어려움 → 2025년부터 손익 정상화. HBM 선행투자 의사결정은 업계 모범 사례</li>
+      <li><strong>내부자 지분</strong>: SK스퀘어 지주회사 보유 약 20.07% (안정적 지배구조)</li>
+      <li><strong>주주환원 정책</strong>: 별도 FCF의 5% + 안정 배당 (주당 1,200원 baseline)</li>
+      <li><strong>보상 연계성</strong>: 장기 ROE/주가 연동 성과급 비중 확대</li>
+    </ul>
+  </div>
+
+  <!-- 8. 밸류에이션 -->
+  <div class="gs-section">
+    <h3><span class="num">8</span>밸류에이션 스냅샷</h3>
+    <table>
+      <tr><th>지표</th><th>현재</th><th>5년 평균</th><th>섹터 동종업체</th><th>해석</th></tr>
+      <tr>
+        <td>PER (2026E)</td>
+        <td class="price">11.5x</td>
+        <td class="price">14.0x</td>
+        <td class="price">Micron 12x / 삼성전자 13x</td>
+        <td class="positive">저평가</td>
+      </tr>
+      <tr>
+        <td>PBR</td>
+        <td class="price">2.8x</td>
+        <td class="price">1.8x</td>
+        <td class="price">Micron 2.5x</td>
+        <td class="neutral">고평가 (ROE 정당화)</td>
+      </tr>
+      <tr>
+        <td>PSR</td>
+        <td class="price">2.5x</td>
+        <td class="price">2.0x</td>
+        <td class="price">Micron 3.0x</td>
+        <td class="positive">상대적 저평가</td>
+      </tr>
+      <tr>
+        <td>EV/EBITDA</td>
+        <td class="price">5.8x</td>
+        <td class="price">7.5x</td>
+        <td class="price">Micron 6.5x</td>
+        <td class="positive">현저한 저평가</td>
+      </tr>
+      <tr>
+        <td>배당수익률</td>
+        <td class="price">0.7%</td>
+        <td class="price">1.5%</td>
+        <td class="price">Micron 0.5%</td>
+        <td class="neutral">주가 상승으로 수익률 하락</td>
+      </tr>
+    </table>
+    <p style="margin-top:12px; color:#cbd5e0;">
+      <strong>핵심 인사이트</strong>: 주가 급등에도 EPS 성장이 더 빠르게 진행 → <strong>밸류에이션은 오히려 디레이팅</strong>. PER 11.5배는 AI 슈퍼사이클 정점 대비 매우 합리적 수준.
+    </p>
+  </div>
+
+  <!-- 9. 시나리오 -->
+  <div class="gs-section">
+    <h3><span class="num">9</span>강세 vs 약세 시나리오 (12개월)</h3>
+    <div class="scenario-grid">
+      <div class="scenario-card scenario-bull">
+        <h4>🐂 강세 시나리오 (확률 55%)</h4>
+        <div class="price-target">2,500,000원 (+35%)</div>
+        <ul style="margin-top:10px;">
+          <li>HBM4 양산 성공 + ASP 추가 상승</li>
+          <li>Nvidia Blackwell Ultra/Rubin 수요 폭증</li>
+          <li>2026 EPS 컨센서스 추가 +15% 상향</li>
+          <li>일반 DRAM 가격 동반 상승</li>
+          <li>PER 13배 리레이팅</li>
+        </ul>
+      </div>
+      <div class="scenario-card scenario-bear">
+        <h4>🐻 약세 시나리오 (확률 25%)</h4>
+        <div class="price-target">1,300,000원 (-30%)</div>
+        <ul style="margin-top:10px;">
+          <li>AI CapEx 둔화 / 빅테크 지출 축소</li>
+          <li>HBM 경쟁 심화 (삼성/Micron 추격)</li>
+          <li>중국 CXMT 범용 DRAM 공급 확대</li>
+          <li>지정학적 리스크 (대만/한국)</li>
+          <li>메모리 사이클 정점 통과</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:15px; color:#cbd5e0;">
+      <strong>기본 시나리오 (확률 20%, 2,300,000원)</strong>: HBM 점진적 성장 + 메모리 사이클 정상 추이 → 12개월 목표가 산정 근거.
+      <br><strong>기댓값 계산</strong>: (0.55 × 2,500,000) + (0.20 × 2,300,000) + (0.25 × 1,300,000) = <strong>2,160,000원 (+16.9%)</strong>
+    </p>
+  </div>
+
+  <!-- 골드만 결론 -->
+  <div class="gs-conclusion">
+    <h2>★ 골드만 삭스 투자 결론</h2>
+    <p style="font-size:16px;">
+      SK하이닉스는 <strong>AI 시대 메모리 반도체 슈퍼사이클의 최대 수혜 기업</strong>으로,
+      HBM 시장 글로벌 1위 지위와 Nvidia 단독 공급사라는 절대적 경쟁 우위를 통해
+      2026~2027년 EPS 컨센서스 추가 상향 가능성이 높습니다.
+      현재 PER 11.5배는 영업이익률 40%대 ROE 33%의 기업으로서 명백히 저평가 영역이며,
+      EV/EBITDA 5.8배는 글로벌 동종업체(Micron 6.5배) 대비 할인 거래되고 있습니다.
+    </p>
+    <p style="font-size:16px; margin-top:15px;">
+      <strong>투자 의견: 매수 (BUY)</strong> | <strong>12개월 목표가: 2,300,000원 (상승 여력 +24.5%)</strong> | <strong>확신 수준: High</strong>
+      <br>
+      모건 스탠리 기술적 분석에서 확인된 단기 과매수 조정은 <strong>매수 기회</strong>로 활용 권고.
+      1,789,000원 ~ 1,850,000원 구간에서 분할 매수 후 중장기(12-18개월) 보유 전략 추천.
+      주요 리스크는 ① AI CapEx 둔화, ② 메모리 사이클 정점, ③ 중국 메모리 추격 — 세 요인 모니터링 필요.
+    </p>
+  </div>
+
+  <div class="meta-info">
+    본 분석은 Morgan Stanley 기술 전략 및 Goldman Sachs 펀더멘털 리서치 스타일을 모방한 교육·참고용 자료이며, 실제 투자 추천이 아닙니다.<br>
+    분석 기준일: 2026-05-18 | 데이터 기준: 2026-05-15 종가 | 추정치는 컨센서스 기반 가상 시나리오
+  </div>
+
+</div>
+</body>
+</html>
