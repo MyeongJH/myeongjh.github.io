@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBIS 통합 분석 리포트 — Goldman Sachs Fundamentals + Morgan Stanley Technicals (2026-05-18)</title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --panel: #141a30;
+    --panel2: #1a2140;
+    --line: #2a3358;
+    --text: #e6ecff;
+    --muted: #9aa6c7;
+    --pos: #22c55e;
+    --neg: #ef4444;
+    --warn: #f59e0b;
+    --accent: #60a5fa;
+    --accent2: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px;
+    background: linear-gradient(180deg, #0a0f1f 0%, #0b1020 100%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+    line-height: 1.65;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header {
+    border-radius: 14px;
+    background: linear-gradient(135deg, #131a36 0%, #1a2245 100%);
+    padding: 28px 32px;
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .firm { font-size: 13px; letter-spacing: 2px; color: var(--accent); font-weight: 700; }
+  h1 { margin: 6px 0 10px; font-size: 28px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .badge {
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    background: var(--panel2); border: 1px solid var(--line);
+  }
+  .badge.buy { background: rgba(34,197,94,0.15); color: var(--pos); border-color: rgba(34,197,94,0.4); }
+  .badge.warn { background: rgba(245,158,11,0.15); color: var(--warn); border-color: rgba(245,158,11,0.4); }
+  .badge.neutral { background: rgba(96,165,250,0.15); color: var(--accent); border-color: rgba(96,165,250,0.4); }
+
+  .summary {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 24px;
+  }
+  .summary h2 { margin-top: 0; font-size: 18px; color: var(--accent); }
+  .grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px;
+  }
+  .kpi {
+    background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 14px;
+  }
+  .kpi .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .kpi .val { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .kpi .delta { font-size: 12px; margin-top: 2px; color: var(--muted); }
+  .kpi .delta.pos { color: var(--pos); }
+  .kpi .delta.neg { color: var(--neg); }
+
+  section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 18px;
+  }
+  section h2 {
+    font-size: 18px;
+    border-left: 4px solid var(--accent);
+    padding-left: 10px;
+    margin: 0 0 14px;
+  }
+  section h3 { font-size: 15px; margin: 16px 0 6px; color: var(--accent2); }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 6px; font-size: 14px; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td.pos { color: var(--pos); font-weight: 600; }
+  td.neg { color: var(--neg); font-weight: 600; }
+  td.warn { color: var(--warn); font-weight: 600; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 4px; }
+
+  .trade-box {
+    background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(96,165,250,0.08));
+    border: 1px solid rgba(34,197,94,0.3);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 12px;
+  }
+  .trade-box h3 { color: var(--pos); margin-top: 0; }
+
+  .conclusion {
+    background: linear-gradient(135deg, #1a2245 0%, #2a3170 100%);
+    border: 1px solid var(--accent);
+    color: var(--text);
+  }
+  .conclusion h2 { border-color: var(--pos); }
+
+  .disclaimer {
+    color: var(--muted); font-size: 12px; margin-top: 24px; padding: 14px;
+    border: 1px dashed var(--line); border-radius: 10px; line-height: 1.5;
+  }
+
+  /* Goldman 펀더멘털 섹션 전용 스타일 */
+  .gs-header {
+    background: linear-gradient(135deg, #1e1638 0%, #2b1f55 100%);
+    border-color: #a78bfa;
+  }
+  .gs-header .firm { color: #c4b5fd; }
+  .rating-box {
+    background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(167,139,250,0.12));
+    border: 1px solid rgba(167,139,250,0.4);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 14px;
+  }
+  .rating-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+  }
+  .rating-cell {
+    text-align: center;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 10px 6px;
+  }
+  .rating-cell .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .rating-cell .val { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .moat-bar {
+    display: flex; align-items: center; gap: 10px; margin: 4px 0;
+  }
+  .moat-name { width: 130px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
+  .moat-track {
+    flex: 1; height: 10px; background: var(--panel2); border-radius: 6px; overflow: hidden; border: 1px solid var(--line);
+  }
+  .moat-fill {
+    height: 100%; border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .moat-score { width: 44px; text-align: right; font-weight: 700; font-size: 14px; }
+
+  .scenario-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;
+  }
+  .scenario-card {
+    border-radius: 12px; padding: 16px; border: 1px solid var(--line);
+  }
+  .scenario-card.bull {
+    background: linear-gradient(135deg, rgba(34,197,94,0.10), rgba(96,165,250,0.08));
+    border-color: rgba(34,197,94,0.4);
+  }
+  .scenario-card.bear {
+    background: linear-gradient(135deg, rgba(239,68,68,0.10), rgba(245,158,11,0.05));
+    border-color: rgba(239,68,68,0.4);
+  }
+  .scenario-card h4 {
+    margin: 0 0 10px; font-size: 15px;
+  }
+  .scenario-card.bull h4 { color: var(--pos); }
+  .scenario-card.bear h4 { color: var(--neg); }
+  .scenario-card .target {
+    font-size: 22px; font-weight: 800; margin: 8px 0;
+  }
+
+  .divider {
+    text-align: center; margin: 36px 0 24px; color: var(--muted); font-size: 12px;
+    letter-spacing: 4px; position: relative;
+  }
+  .divider::before, .divider::after {
+    content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: var(--line);
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+
+  .toc {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 20px; margin-bottom: 22px;
+  }
+  .toc h3 { margin: 0 0 8px; font-size: 14px; color: var(--accent); }
+  .toc ul { columns: 2; column-gap: 24px; padding-left: 18px; margin: 0; }
+  .toc li { font-size: 13px; margin-bottom: 3px; }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+
+  @media (max-width: 720px) {
+    body { padding: 14px; font-size: 14px; }
+    header { padding: 18px; }
+    h1 { font-size: 21px; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .rating-row { grid-template-columns: repeat(2, 1fr); }
+    .scenario-grid { grid-template-columns: 1fr; }
+    .toc ul { columns: 1; }
+    section { padding: 16px 18px; }
+    section h2 { font-size: 16px; }
+    table { font-size: 12px; }
+    th, td { padding: 6px 6px; }
+    .moat-name { width: 100px; font-size: 12px; }
+    .kpi .val { font-size: 16px; }
+    .badges { gap: 6px; }
+    .badge { font-size: 11px; padding: 5px 9px; }
+  }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
+    .rating-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="gs-header">
+  <div class="firm">GOLDMAN SACHS — GLOBAL INVESTMENT RESEARCH</div>
+  <h1>NBIS · Nebius Group N.V. — 기관 투자자 리서치 노트</h1>
+  <div class="sub">리포트 일자: 2026-05-18 (월) · 섹터: AI 인프라 / 클라우드 / 데이터센터 · 현재가: $219.94</div>
+
+  <div class="rating-box">
+    <div class="rating-row">
+      <div class="rating-cell">
+        <div class="label">투자의견</div>
+        <div class="val" style="color: var(--pos);">BUY</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">12개월 목표가</div>
+        <div class="val">$285</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">상승여력</div>
+        <div class="val" style="color: var(--pos);">+29.6%</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">확신 수준</div>
+        <div class="val" style="color: var(--accent);">High</div>
+      </div>
+      <div class="rating-cell">
+        <div class="label">리스크 등급</div>
+        <div class="val" style="color: var(--warn);">High</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="badges">
+    <span class="badge buy">Conviction List 후보</span>
+    <span class="badge neutral">AI 인프라 Tier-1</span>
+    <span class="badge warn">변동성 高</span>
+    <span class="badge">시가총액 ~$54B (추정)</span>
+  </div>
+</header>
+
+<div class="toc">
+  <h3>📑 목차</h3>
+  <ul>
+    <li><strong>Part Ⅰ. 펀더멘털 분석 (Goldman Sachs)</strong></li>
+    <li><a href="#f1">F1. 비즈니스 모델</a></li>
+    <li><a href="#f2">F2. 수익원·세그먼트</a></li>
+    <li><a href="#f3">F3. 수익성 분석</a></li>
+    <li><a href="#f4">F4. 대차대조표 건전성</a></li>
+    <li><a href="#f5">F5. 자유현금흐름</a></li>
+    <li><a href="#f6">F6. 경쟁 우위 (해자)</a></li>
+    <li><a href="#f7">F7. 경영진 품질</a></li>
+    <li><a href="#f8">F8. 밸류에이션</a></li>
+    <li><a href="#f9">F9. 강세·약세 시나리오</a></li>
+    <li><a href="#f10">F10. 펀더멘털 결론</a></li>
+    <li><strong>Part Ⅱ. 기술적 분석 (Morgan Stanley)</strong></li>
+    <li><a href="#tech-summary">T0. 거래 계획 요약</a></li>
+    <li><a href="#t1">T1~T9. 기술 지표</a></li>
+    <li><a href="#t10">T10. 거래 설정</a></li>
+  </ul>
+</div>
+
+<div class="divider">PART Ⅰ · FUNDAMENTAL ANALYSIS</div>
+
+<section id="f1">
+  <h2>F1. 비즈니스 모델 (Business Model)</h2>
+  <p>
+    Nebius Group(舊 Yandex N.V.의 비러시아 자산 분할체)은 <strong>AI 특화 풀스택 클라우드</strong> 사업자입니다.
+    GPU 데이터센터·자체 설계 서버·네트워킹·소프트웨어 스택·MLOps 플랫폼·관리형 추론 서비스(Token Factory)까지 수직 통합한
+    구조로, 기업 고객에게 NVIDIA H100/H200/B200 기반 컴퓨트를 <em>온디맨드 + 장기 약정</em>으로 판매합니다.
+  </p>
+  <p>
+    수익 창출 방식은 (1) <strong>AI 클라우드 컴퓨트 임대</strong>가 핵심이며, (2) Avride(자율주행), (3) TripleTen(에듀테크),
+    (4) Toloka(데이터 라벨링) 등 4개 자회사 포트폴리오로 구성됩니다. 핵심 수익 동력은 AI Cloud 부문이며, 본질적으로
+    <strong>"전력·GPU·서버 자본을 ARR로 전환하는 자본집약형 인프라 사업"</strong>입니다.
+  </p>
+</section>
+
+<section id="f2">
+  <h2>F2. 수익원·세그먼트 (Revenue Breakdown)</h2>
+  <p>Q1 2026 매출 <strong>$399M</strong> (전년 동기 $50.9M 대비 <span class="pos" style="color:var(--pos);">+684%</span>):</p>
+  <table>
+    <tr><th>세그먼트</th><th>Q1 비중(추정)</th><th>YoY 성장률</th><th>성장 궤적</th></tr>
+    <tr><td>Nebius AI Cloud (코어)</td><td>~88%</td><td class="pos">+841%</td><td class="pos">초가속 — ARR $1.9B</td></tr>
+    <tr><td>Avride (자율주행)</td><td>~3%</td><td>n/m</td><td>R&amp;D 단계, 매출 미미</td></tr>
+    <tr><td>TripleTen (에듀테크)</td><td>~5%</td><td>+50% 수준</td><td class="pos">흑자 전환 근접</td></tr>
+    <tr><td>Toloka (데이터)</td><td>~4%</td><td>2~3배</td><td class="pos">LLM Post-training 수혜</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    핵심 KPI 업데이트: 계약된 전력 용량 <strong>3.5GW 돌파</strong> (연말 4GW+ 가이던스), 자가보유 비율 <strong>75% 이상</strong>으로
+    상승하며 임대 의존도 축소. 2026 ARR 목표 <strong>$7~9B</strong>, 풀이어 매출 가이던스 <strong>$3.0~3.4B</strong>로 상향.
+  </p>
+</section>
+
+<section id="f3">
+  <h2>F3. 수익성 분석 (Profitability)</h2>
+  <p>분할 상장 후 2년차로 5년 시계열은 제한적이나, 분기별 마진 개선이 매우 가파릅니다.</p>
+  <table>
+    <tr><th>지표</th><th>Q1 2025</th><th>Q4 2025</th><th>Q1 2026</th><th>방향</th></tr>
+    <tr><td>매출 ($M)</td><td>50.9</td><td>~187</td><td>399</td><td class="pos">↑ 7.8배</td></tr>
+    <tr><td>AI Cloud Adj. EBITDA 마진</td><td>음수</td><td>24%</td><td>45%</td><td class="pos">↑ +21%p QoQ</td></tr>
+    <tr><td>그룹 영업이익률</td><td>대규모 적자</td><td>적자</td><td>적자 (개선중)</td><td class="warn">감가상각 ↑</td></tr>
+    <tr><td>2026 가이던스 그룹 EBITDA 마진</td><td colspan="3" style="text-align:center;"><strong>~40%</strong></td><td class="pos">규모의 경제 발효</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    GPU 활용률(Utilization)이 신규 데이터센터의 램프업 곡선을 따라 70% → 85% 수준에 안착하며 마진이 비선형적으로 개선되는
+    구조. 감가상각은 5년으로 확장되어 GAAP EBIT은 당분간 적자 유지.
+  </p>
+</section>
+
+<section id="f4">
+  <h2>F4. 대차대조표 건전성 (Balance Sheet)</h2>
+  <table>
+    <tr><th>항목</th><th>금액(추정, 최신)</th><th>해석</th></tr>
+    <tr><td>총자산</td><td>$10.1B</td><td>—</td></tr>
+    <tr><td>총부채(Liabilities)</td><td>$5.3B</td><td>—</td></tr>
+    <tr><td>자기자본</td><td>$4.8B</td><td>—</td></tr>
+    <tr><td>총금융부채(Debt)</td><td>$4.1B</td><td class="warn">CapEx 자금조달</td></tr>
+    <tr><td>현금성 자산</td><td><strong>$9.3B</strong></td><td class="pos">강한 유동성</td></tr>
+    <tr><td>부채/자기자본(D/E)</td><td>85.4%</td><td class="warn">중간 — 인프라 업종 평균 수준</td></tr>
+    <tr><td>현금비율(Cash Ratio)</td><td>2.41</td><td class="pos">매우 양호</td></tr>
+    <tr><td>순현금 포지션</td><td class="pos">+$5.2B</td><td class="pos">CapEx 절반 자체 조달 가능</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    2024년 Magnetar Capital 등 주도 라운드로 약 $700M 조달, 이후 EB-5 채권 및 우선주 발행으로 자본 확충. 단기 유동성은
+    "AI 인프라 신생 기업 중 최상위권"이라 평가 가능. 단, 2026~27년 CapEx 사이클이 끝나기 전까지는 추가 채권/유증 가능성 상존.
+  </p>
+</section>
+
+<section id="f5">
+  <h2>F5. 자유현금흐름 (FCF) 분석</h2>
+  <table>
+    <tr><th>지표</th><th>값</th><th>코멘트</th></tr>
+    <tr><td>Levered FCF (TTM)</td><td class="neg">-$6.13B</td><td>대규모 CapEx 단계</td></tr>
+    <tr><td>FCF Yield (TTM)</td><td class="neg">-11% 수준</td><td>현 단계에선 의미 없음</td></tr>
+    <tr><td>2026 CapEx 가이던스</td><td>$20–25B</td><td>이미 계약 백로그로 정당화</td></tr>
+    <tr><td>CapEx 자금조달 비율</td><td>~60% 내부</td><td class="pos">현금 + 영업현금흐름 + 약정</td></tr>
+    <tr><td>자본 배분 1순위</td><td colspan="2">데이터센터 자체 건설(임대 → 자가보유 전환)</td></tr>
+    <tr><td>자본 배분 2순위</td><td colspan="2">GPU 사전 구매(NVIDIA Blackwell)</td></tr>
+    <tr><td>자본 배분 3순위</td><td colspan="2">소프트웨어 스택(R&amp;D)</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    <strong>2027~28년이 FCF 변곡점</strong>. ARR이 $7B 이상이 되고 신규 데이터센터 ramp-up이 완료되면 영업현금흐름이 CapEx를
+    상회, FCF 흑자 전환 가능성이 높습니다. 현 단계는 "수익화 전 부담" 구간.
+  </p>
+</section>
+
+<section id="f6">
+  <h2>F6. 경쟁 우위 (Economic Moat, 1–10점)</h2>
+  <p>아래는 골드만 모트 평가 프레임워크 기반 5개 차원 평가:</p>
+
+  <div class="moat-bar"><div class="moat-name">가격 결정력</div><div class="moat-track"><div class="moat-fill" style="width:60%;"></div></div><div class="moat-score">6/10</div></div>
+  <div class="moat-bar"><div class="moat-name">브랜드 강도</div><div class="moat-track"><div class="moat-fill" style="width:50%;"></div></div><div class="moat-score">5/10</div></div>
+  <div class="moat-bar"><div class="moat-name">전환 비용</div><div class="moat-track"><div class="moat-fill" style="width:70%;"></div></div><div class="moat-score">7/10</div></div>
+  <div class="moat-bar"><div class="moat-name">네트워크 효과</div><div class="moat-track"><div class="moat-fill" style="width:40%;"></div></div><div class="moat-score">4/10</div></div>
+  <div class="moat-bar"><div class="moat-name">규모/원가 우위</div><div class="moat-track"><div class="moat-fill" style="width:80%;"></div></div><div class="moat-score">8/10</div></div>
+
+  <p style="color: var(--muted); font-size: 13px;">
+    <strong>종합 모트: 6/10 (Narrow Moat)</strong>. CoreWeave·Lambda·Crusoe와 경쟁하나, 자가보유 데이터센터 비중과 수직 통합도가
+    상대적으로 높습니다. 약점은 하이퍼스케일러(AWS/Azure/GCP) 대비 영업력·브랜드·소프트웨어 생태계이며, 강점은 GPU 조달 속도와
+    유럽·신흥시장 거점.
+  </p>
+</section>
+
+<section id="f7">
+  <h2>F7. 경영진 품질</h2>
+  <table>
+    <tr><th>항목</th><th>평가</th><th>근거</th></tr>
+    <tr><td>CEO Arkady Volozh</td><td class="pos">강력</td><td>Yandex 창업자, 인터넷·AI 0→1 빌더 트랙</td></tr>
+    <tr><td>자본 배분 실적</td><td class="warn">단기 트랙 짧음</td><td>분할 후 2년, 그러나 CapEx 시계 명확</td></tr>
+    <tr><td>내부자 지분</td><td class="pos">높음</td><td>창업자·초기 직원 지분 상당</td></tr>
+    <tr><td>최근 내부자 매도</td><td class="warn">약 $15M</td><td>실적 발표 직전 일부 매도 — 일상적 분산 매도로 해석</td></tr>
+    <tr><td>가이던스 신뢰도</td><td class="pos">양호</td><td>최근 2개 분기 모두 상회·재상향</td></tr>
+    <tr><td>전략적 파트너십</td><td class="pos">우수</td><td>NVIDIA, Meta($27B), Microsoft (검증)</td></tr>
+  </table>
+</section>
+
+<section id="f8">
+  <h2>F8. 밸류에이션 스냅샷 (Valuation)</h2>
+  <table>
+    <tr><th>지표</th><th>NBIS 현재</th><th>5년 평균</th><th>섹터 동종업체 평균</th><th>해석</th></tr>
+    <tr><td>P/S (TTM)</td><td class="warn">82.8x</td><td>n/a (신생)</td><td>CRWV 25x, AI Hyper 12x</td><td>매우 프리미엄</td></tr>
+    <tr><td>P/S (FY26E, 매출 $3.2B 가정)</td><td>~17.0x</td><td>—</td><td>CRWV ~10x</td><td class="warn">여전히 프리미엄</td></tr>
+    <tr><td>P/S (FY27E, ARR $8B 가정)</td><td class="pos">~6.7x</td><td>—</td><td>—</td><td class="pos">합리화 가능</td></tr>
+    <tr><td>EV/EBITDA (FY26E)</td><td>~40x</td><td>—</td><td>~25x</td><td class="warn">고평가</td></tr>
+    <tr><td>EV/EBITDA (FY27E)</td><td class="pos">~14x</td><td>—</td><td>—</td><td class="pos">적정</td></tr>
+    <tr><td>P/E (TTM)</td><td class="warn">N/M (적자)</td><td>—</td><td>—</td><td>의미 없음</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    핵심: <strong>"현재 멀티플이 아니라 2년 후 ARR 기반 멀티플로 봐야 한다"</strong>가 강세 논리. 가이던스 ARR $8B를 100% 신뢰할 경우
+    FY27 EV/Sales는 6~7x로, AI 인프라 프리미엄 감안 시 정당화 가능. 약세 논리는 CapEx 미스, GPU 가격 하락, 고객 집중도(Meta 비중) 리스크.
+  </p>
+</section>
+
+<section id="f9">
+  <h2>F9. 강세 vs 약세 시나리오 (12개월)</h2>
+  <div class="scenario-grid">
+    <div class="scenario-card bull">
+      <h4>🚀 강세 시나리오 (확률 45%)</h4>
+      <div class="target" style="color: var(--pos);">$320</div>
+      <ul style="font-size: 13px;">
+        <li>FY26 매출 가이던스 상단($3.4B) 초과 달성</li>
+        <li>ARR $9B+ 진입, Q4 EBITDA 마진 50% 돌파</li>
+        <li>Meta 외 추가 하이퍼스케일러 계약(MSFT·Oracle)</li>
+        <li>NVIDIA Blackwell 우선 할당으로 공급 우위 확보</li>
+        <li>FY27 EV/EBITDA 18x 적용 가능</li>
+      </ul>
+    </div>
+    <div class="scenario-card bear">
+      <h4>📉 약세 시나리오 (확률 25%)</h4>
+      <div class="target" style="color: var(--neg);">$130</div>
+      <ul style="font-size: 13px;">
+        <li>CapEx $25B → 자금조달 압박, 추가 유증·전환사채</li>
+        <li>GPU 가격 30% 하락 → 단가/마진 동시 압축</li>
+        <li>Meta 계약 일부 지연 또는 마일스톤 미달성</li>
+        <li>AI 클라우드 공급 과잉 우려 부각</li>
+        <li>매크로 충격·금리 재상승으로 멀티플 압축</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top: 12px; color: var(--muted); font-size: 13px;">
+    베이스(30%): 가이던스 충족 + 멀티플 안정 → <strong>$285</strong> (현재가 대비 +30%) 목표.
+    가중 평균 기대값: 0.45×$320 + 0.30×$285 + 0.25×$130 ≈ <strong>$262</strong>.
+  </p>
+</section>
+
+<section id="f10" class="conclusion">
+  <h2>F10. 펀더멘털 결론</h2>
+  <p style="font-size: 15px;">
+    NBIS는 AI 인프라 사이클의 가장 순도 높은 수혜주 중 하나로, <strong>매출 +684%, ARR $1.9B, AI EBITDA 마진 45%</strong>라는 강력한
+    펀더멘털 모멘텀과 <strong>Meta $27B 계약</strong>이라는 구조적 백로그를 동시에 보유합니다. 자기자본 $4.8B·현금 $9.3B의
+    유동성은 단기 CapEx 사이클을 견딜 수 있는 수준이며, 자가보유 비율 상승이 장기 단위경제(unit economics)를 개선합니다.
+  </p>
+  <p style="font-size: 15px;">
+    리스크는 (1) 자본 배분 사이클 후반 잉여현금 적자 지속, (2) GPU·전력 공급 변동성, (3) 하이퍼스케일러 자체 칩 내재화에
+    따른 수요 잠식 가능성이며, 현재 멀티플은 <strong>FY27 ARR 실현을 전제</strong>로 정당화됩니다.
+  </p>
+  <p style="font-size: 16px; margin-top: 14px;">
+    <strong style="color: var(--pos);">투자의견: BUY, 12개월 목표가 $285, 확신 수준 High.</strong>
+    포지션 사이징은 변동성 감안 포트폴리오의 2~4% 권고, 신규 진입은 기술적 분석 섹션의 $208~$215 풀백 구간에서 분할.
+  </p>
+</section>
+
+<div class="divider">PART Ⅱ · TECHNICAL ANALYSIS</div>
+
+<header>
+  <div class="firm">MORGAN STANLEY — EQUITY TECHNICAL STRATEGY</div>
+  <h1>NBIS · Nebius Group N.V. — 기술적 분석 노트</h1>
+  <div class="sub">리포트 일자: 2026-05-18 (월) · 분석가: 선임 기술 전략가 데스크 · 종가 기준: $219.94</div>
+  <div class="badges">
+    <span class="badge buy">의견: BUY (Pullback 매수)</span>
+    <span class="badge warn">단기: 과매수·고변동</span>
+    <span class="badge neutral">12개월 추세: 강세</span>
+    <span class="badge">시가총액: 메가캡 AI 인프라</span>
+  </div>
+</header>
+
+<div class="summary" id="tech-summary">
+  <h2>거래 계획 요약 (Trade Plan at a Glance)</h2>
+  <div class="grid">
+    <div class="kpi"><div class="label">현재가</div><div class="val">$219.94</div><div class="delta neg">-1.21 (-0.54%)</div></div>
+    <div class="kpi"><div class="label">진입 구간</div><div class="val">$208 – $215</div><div class="delta">5일선 되돌림 부근</div></div>
+    <div class="kpi"><div class="label">손절 (Stop)</div><div class="val">$197</div><div class="delta neg">기준선 +20일선 하향</div></div>
+    <div class="kpi"><div class="label">목표가 1 / 2</div><div class="val">$234 / $258</div><div class="delta pos">ATH 재돌파 후 측정이동</div></div>
+  </div>
+  <p style="margin: 14px 0 0; color: var(--muted); font-size: 13px;">
+    리스크/리워드(중심값 $211 진입 기준): 손절 $14 vs 목표2 $47 → <strong style="color: var(--pos);">약 3.4 : 1</strong>.
+    당일 ATH(-5.89%) 직후 첫 풀백 국면 — 가속을 추격하지 말고 5일선/구름 위 되돌림에서 분할 진입 권고.
+  </p>
+</div>
+
+<section id="t1">
+  <h2>T1. 추세 분석 (Trend Analysis)</h2>
+  <p>
+    NBIS는 2026년 2월 5일 저점 <strong>$73.52</strong>에서 5월 14일 사상 최고가 <strong>$233.72</strong>까지
+    약 <strong style="color: var(--pos);">+217%</strong> 상승한 강력한 1차 상승 추세 안에 있습니다.
+    단기·중기·장기 시간대 모두 동일한 방향을 가리킵니다.
+  </p>
+  <table>
+    <tr><th>시간대</th><th>추세 방향</th><th>판단 근거</th></tr>
+    <tr><td>일간(Daily)</td><td class="pos">강세 (Uptrend)</td><td>5일선 $202.71 위, 연속 고점·저점 상향</td></tr>
+    <tr><td>주간(Weekly)</td><td class="pos">강한 강세</td><td>5월 13일 +15.7% 갭상승으로 신고가 돌파</td></tr>
+    <tr><td>월간(Monthly)</td><td class="pos">강세 (가속)</td><td>2~5월 4개월 연속 양봉, 거래량 동반</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    이동평균선 정배열이 완전히 형성되어 있습니다: <strong>5MA &gt; 20MA &gt; 60MA &gt; 120MA</strong>
+    ($202.71 &gt; $170.66 &gt; $133.41 &gt; $113.32). 추세 강도(Trend Strength)는 10점 만점 <strong>9점</strong>.
+  </p>
+</section>
+
+<section>
+  <h2>2. 지지·저항 (Support & Resistance)</h2>
+  <table>
+    <tr><th>유형</th><th>가격</th><th>근거</th></tr>
+    <tr><td class="pos">1차 저항</td><td>$228 – $229</td><td>당일 고가, 5/14 윗꼬리 부근</td></tr>
+    <tr><td class="pos">핵심 저항 (ATH)</td><td><strong>$233.72</strong></td><td>5/14 신고가 — 돌파 시 추세 가속</td></tr>
+    <tr><td class="pos">측정 저항</td><td>$258 – $265</td><td>전 박스권($85~$125) 폭 측정이동</td></tr>
+    <tr><td class="warn">중심값(피봇)</td><td>$220</td><td>심리적 정수, 현재 종가 권역</td></tr>
+    <tr><td class="neg">1차 지지</td><td>$211 – $213</td><td>당일 저가, 5월 13일 갭 상단</td></tr>
+    <tr><td class="neg">핵심 지지</td><td>$201 – $203</td><td>5일선 + 일목 전환선($201.21) 합류</td></tr>
+    <tr><td class="neg">위험 지지</td><td>$183 – $186</td><td>일목 기준선($183.20), 5/13 갭 메움</td></tr>
+    <tr><td class="neg">추세 이탈선</td><td>$170</td><td>20일선($170.66) — 단기 추세 훼손선</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>3. 이동평균 분석 (Moving Averages)</h2>
+  <table>
+    <tr><th>기간</th><th>가격</th><th>현재가 대비</th><th>신호</th></tr>
+    <tr><td>5일 MA</td><td>$202.71</td><td class="pos">+8.5%</td><td class="pos">초단기 지지</td></tr>
+    <tr><td>20일 MA</td><td>$170.66</td><td class="pos">+28.9%</td><td class="pos">단기 지지</td></tr>
+    <tr><td>60일 MA</td><td>$133.41</td><td class="pos">+64.9%</td><td class="pos">중기 지지</td></tr>
+    <tr><td>120일 MA</td><td>$113.32</td><td class="pos">+94.1%</td><td class="warn">장기 — 격차 과도</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    완벽한 정배열(Perfect Bullish Alignment). 단, 현재가가 120일선 대비 <strong>+94%</strong> 이격되어
+    역사적으로 단기 평균회귀(Mean Reversion) 압력이 강한 구간입니다. 추가 추격 매수보다는 5~20일선 부근
+    되돌림에서 진입이 통계적으로 유리합니다.
+  </p>
+</section>
+
+<section>
+  <h2>4. RSI 분석</h2>
+  <p>
+    일간 <strong>RSI(14)</strong>는 <strong style="color: var(--warn);">72.14</strong>로
+    <span style="color: var(--warn);">과매수(Overbought)</span> 영역에 진입.
+    시그널선(14SMA of RSI) <strong>64.00</strong>은 여전히 RSI보다 아래에 있어 <span class="pos" style="color:var(--pos);">모멘텀 자체는 유효</span>합니다.
+  </p>
+  <ul>
+    <li>RSI 70 돌파는 강세장에서 <strong>지속 신호</strong>로 해석되는 경우가 많지만, $233 ATH 부근에서 한 차례 베어리시 다이버전스가 형성될 가능성을 모니터링.</li>
+    <li>RSI 60선까지의 되돌림(통상 5~10% 가격 조정 동반)이 일반적인 재진입 신호.</li>
+    <li>외부 데이터: 5월 7일 10일 RSI는 과매수 영역에서 이탈한 바 있어 단기 변동성 사이클이 활성화된 상태.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>5. MACD 분석</h2>
+  <p>
+    공개된 데이터에 따르면 일간 <strong>MACD(12,26,9)</strong> 값은 <strong>+12.64</strong>로 <span class="pos" style="color:var(--pos);">제로라인 위·매수 신호</span>를 유지.
+    다만 시그널선 아래·히스토그램 감소 국면으로, <strong>모멘텀 둔화</strong>(상승 가속도 약화) 신호가 함께 나오고 있습니다.
+  </p>
+  <ul>
+    <li>5월 5일 MACD가 양전(+)으로 전환된 이후 추세 신호 유효.</li>
+    <li>월간 MACD: 3개월 기준으로는 매도 신호가 일부 잔존 — 장기 캔들 종가 확정 전까진 가속 추격 주의.</li>
+    <li>해석: <strong>"신규 매수세 유입 없이 자율적으로는 추가 상승 어렵다"</strong> → 거래량 동반 양봉 한 차례 더 필요.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>6. 볼린저 밴드 & 일목균형표</h2>
+  <h3>볼린저 밴드</h3>
+  <p>
+    추정치 기준 20일 BB 중심선 ~$170.66, 상단(2σ) ~$220 영역. 현재가는 <strong>상단 밴드 부근</strong>에서 등락 중 —
+    <span class="warn" style="color: var(--warn);">밴드 워킹(Band Walking)</span> 상태로 강세 지속이지만 단기 변동성 확대 구간입니다.
+  </p>
+  <h3>일목균형표</h3>
+  <table>
+    <tr><th>구성요소</th><th>값</th><th>해석</th></tr>
+    <tr><td>전환선</td><td>$201.21</td><td class="pos">기준선 위 → 단기 강세</td></tr>
+    <tr><td>기준선</td><td>$183.20</td><td class="pos">우상향 진행</td></tr>
+    <tr><td>후행스팬</td><td>$219.94</td><td class="pos">과거 캔들 위 → 추세 확정</td></tr>
+    <tr><td>선행스팬1</td><td>$118.94</td><td>구름 상단</td></tr>
+    <tr><td>선행스팬2</td><td>$111.66</td><td>구름 하단</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    가격이 구름대(~$112~$119)에서 <strong>약 +85% 위</strong>에 위치 — 강한 양운(陽雲) 추세이나 구름과의 간격이 극단적이라 중기 조정 시 기준선($183) 부근까지 되돌림 가능성 존재.
+  </p>
+</section>
+
+<section>
+  <h2>7. 거래량 분석</h2>
+  <p>
+    20일 거래량 평균 <strong>22.91M</strong>, 당일 거래량 <strong>17.35M</strong>으로 평균보다 약 <span class="warn" style="color: var(--warn);">24% 낮음</span>.
+    가격은 하락(-0.54%)이지만 거래량 동반이 약해 <strong>건전한 숨고르기</strong>로 해석.
+  </p>
+  <ul>
+    <li>5월 13일 +15.7% 갭상승 당시 거래량 폭증 → <strong>거래량 확인된 추세 신호</strong>.</li>
+    <li>이후 신고가 ATH 부근에서 거래량이 점진적으로 감소 → 매도 압력은 제한적, 단 매수세도 둔화.</li>
+    <li>다음 방향성 결정은 <strong>거래량 동반 신고가 돌파 vs 갭 메움</strong> 둘 중 하나로 확정될 가능성.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>8. 피보나치 되돌림</h2>
+  <p>
+    스윙 저점 <strong>$73.52</strong>(2/5) → 스윙 고점 <strong>$233.72</strong>(5/14), 폭 $160.20 기준:
+  </p>
+  <table>
+    <tr><th>레벨</th><th>가격</th><th>의미</th></tr>
+    <tr><td>23.6%</td><td>$195.91</td><td class="pos">얕은 되돌림 (강세 시나리오)</td></tr>
+    <tr><td>38.2%</td><td>$172.50</td><td class="warn">정상 조정 — 20일선과 합류</td></tr>
+    <tr><td>50.0%</td><td>$153.62</td><td class="warn">중기 조정 한계선</td></tr>
+    <tr><td>61.8%</td><td>$134.72</td><td class="neg">추세 훼손 가능 — 60일선 부근</td></tr>
+  </table>
+  <p style="color: var(--muted); font-size: 13px;">
+    1차 핵심 매수 타겟은 <strong>23.6% ($196)</strong>와 일목 전환선($201)이 만나는 <strong>$196~$203 구간</strong>.
+  </p>
+</section>
+
+<section>
+  <h2>9. 차트 패턴 식별</h2>
+  <ul>
+    <li><strong>러닝 트라이앵글 → 깃발(Bull Flag) 돌파:</strong> 12월~4월 박스($85~$125)를 5/13 갭으로 상향 이탈.</li>
+    <li><strong>측정이동(Measured Move):</strong> 박스 폭 약 $40 × 2 → $233 1차 목표 도달 후 $250~$265 영역 가능.</li>
+    <li><strong>고점 캔들 시그널:</strong> 5/14 도지/긴 윗꼬리 캔들 — 단기 변동성 정점 가능성, 그러나 패턴 자체는 미확정.</li>
+    <li><strong>주의 패턴:</strong> 4시간/일간 다이버전스 가능성(가격 신고점 vs RSI 미신고점) — 다음 ATH 도전 시 RSI 추세 동반 여부가 결정적.</li>
+  </ul>
+</section>
+
+<section class="conclusion" id="t10">
+  <h2>T10. 거래 설정 (Trade Setup)</h2>
+
+  <div class="trade-box">
+    <h3>전략 A — 풀백 매수 (메인 시나리오, 70% 확률)</h3>
+    <table>
+      <tr><th>항목</th><th>가격</th><th>비고</th></tr>
+      <tr><td>1차 진입</td><td>$211 – $215</td><td>당일 저가 부근, 갭 상단 / 50% 포지션</td></tr>
+      <tr><td>2차 진입</td><td>$201 – $205</td><td>5일선 + 일목 전환선 합류 / 30% 추가</td></tr>
+      <tr><td>3차 진입(공격)</td><td>$196</td><td>피보 23.6% / 20% 추가 (조건부)</td></tr>
+      <tr><td>손절가</td><td><strong>$197 (장 마감 기준)</strong></td><td>일목 전환선 + 5월 13일 갭 절반 이탈</td></tr>
+      <tr><td>목표 1</td><td>$233.72</td><td class="pos">ATH 재돌파 — 50% 익절</td></tr>
+      <tr><td>목표 2</td><td>$258</td><td class="pos">측정이동 1차 (전 박스 폭 적용)</td></tr>
+      <tr><td>리스크/리워드</td><td><strong>1 : 3.4</strong></td><td>중심진입 $211 기준</td></tr>
+    </table>
+  </div>
+
+  <div class="trade-box" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(167,139,250,0.08)); border-color: rgba(245,158,11,0.3);">
+    <h3 style="color: var(--warn);">전략 B — 돌파 추격 (백업 시나리오, 25% 확률)</h3>
+    <table>
+      <tr><th>항목</th><th>가격</th><th>비고</th></tr>
+      <tr><td>진입 트리거</td><td>$234.00 종가 돌파</td><td>거래량 20일 평균 이상 동반 필수</td></tr>
+      <tr><td>손절가</td><td>$224</td><td>돌파 후 갭 메움 방지선</td></tr>
+      <tr><td>목표 1 / 2</td><td>$258 / $278</td><td>측정이동 1·2차</td></tr>
+      <tr><td>리스크/리워드</td><td>1 : 2.4 / 1 : 4.4</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <div class="trade-box" style="background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(245,158,11,0.05)); border-color: rgba(239,68,68,0.3);">
+    <h3 style="color: var(--neg);">전략 C — 보수적 관망 (5% 확률)</h3>
+    <p style="margin: 6px 0;">
+      RSI 72 + 120일선 +94% 이격이 부담되는 보수 투자자는 <strong>$183~$197</strong> 구간(일목 기준선/전환선)까지의 깊은 조정을
+      기다린 후 분할 매수. 이 구간에서도 추세는 훼손되지 않으며, 더 큰 안전마진을 확보할 수 있음.
+    </p>
+  </div>
+
+  <h3 style="margin-top: 18px;">포지션 사이징 가이드</h3>
+  <ul>
+    <li>변동성이 매우 높음(일중 ±10% 일상). 포트폴리오의 <strong>2~4%</strong> 비중 권장.</li>
+    <li>1R(리스크 단위) = 진입가 – 손절가의 차이($14). 계좌의 1% 손실을 1R로 설정.</li>
+    <li>5월 14일·15일 윗꼬리 캔들이 5거래일 이내에 재돌파되지 않으면 단기 천장 형성 가능성 ↑ — 50% 일부 차익실현 고려.</li>
+  </ul>
+
+  <h3>핵심 결론</h3>
+  <p>
+    NBIS의 장기 추세는 의심의 여지 없이 강세이며, AI 데이터센터 수요(Meta $27B 계약, Q1 매출 +684%)가 펀더멘털 모멘텀을 뒷받침.
+    그러나 단기적으로는 <strong>RSI 과매수 + 120일선 +94% 이격 + 거래량 둔화</strong>의 3중 부담이 존재합니다.
+    <strong style="color: var(--pos);">추격 매수 금지, 풀백 매수 권고.</strong> 진입은 $211~$215에서 시작하고 $201~$205에서 추가하며,
+    $197 종가 이탈 시에만 손절. 목표는 ATH 재돌파 후 $258 측정이동 영역입니다.
+  </p>
+</section>
+
+<div class="disclaimer">
+  본 보고서는 차트 기반 기술적 분석으로, 모건 스탠리 스타일의 형식을 따른 교육·연구 목적 자료입니다.
+  실제 모건 스탠리 발간물이 아니며, 투자 자문이 아닙니다. 가격 데이터는 2026년 5월 15일/16일 공개 자료에 근거하며,
+  거래 결정은 본인의 책임 하에 추가 확인 후 진행하시기 바랍니다. 옵션·레버리지 상품 사용 시 리스크는 더욱 커집니다.
+</div>
+
+</div>
+</body>
+</html>
