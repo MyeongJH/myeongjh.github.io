@@ -3,14 +3,12 @@
 <section id="pages" class="pages-section">
   <div class="pages-inner">
     <h1>Pages</h1>
-    <p class="pages-desc">신규 html 파일을 <code>/pages</code> 디렉터리에 추가하면 자동으로 아래 목록에 노출됩니다.</p>
     <ul class="pages-grid">
       {% for f in page_files %}
         {% if f.extname == ".html" or f.extname == ".htm" %}
           <li class="page-card">
             <a href="{{ f.path | relative_url }}">
               <span class="page-name">{{ f.basename }}</span>
-              <span class="page-path">{{ f.path }}</span>
             </a>
           </li>
         {% endif %}
