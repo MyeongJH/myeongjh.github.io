@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>나우로보틱스(459510) — Goldman Sachs Style Fundamental Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --canvas-dark: #0b0e11;
+    --surface-card: #1e2329;
+    --surface-elevated: #2b3139;
+    --hairline: #2b3139;
+    --primary: #FCD535;
+    --primary-active: #f0b90b;
+    --primary-disabled: #3a3a1f;
+    --on-primary: #181a20;
+    --body: #eaecef;
+    --on-dark: #ffffff;
+    --muted: #707a8a;
+    --muted-strong: #929aa5;
+    --up: #0ecb81;
+    --down: #f6465d;
+    --info: #3b82f6;
+    --font-text: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-num: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--canvas-dark);
+    color: var(--body);
+    font-family: var(--font-text);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--hairline);
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--primary);
+    color: var(--on-primary);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+    font-family: var(--font-num);
+  }
+  .brand-title {
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted-strong);
+    margin-top: 2px;
+  }
+  .report-meta {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .report-meta strong {
+    color: var(--body);
+    font-weight: 500;
+  }
+
+  /* ===== Title Block ===== */
+  .title-block {
+    margin-bottom: 24px;
+  }
+  .title-eyebrow {
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--on-dark);
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .subtitle {
+    color: var(--muted-strong);
+    font-size: 15px;
+  }
+  .ticker-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--surface-elevated);
+    color: var(--body);
+    font-family: var(--font-num);
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+
+  /* ===== Rating Summary Box ===== */
+  .rating-box {
+    background: var(--surface-card);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    border: 1px solid var(--hairline);
+  }
+  .rating-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .rating-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rating-cell + .rating-cell {
+    border-left: 1px solid var(--hairline);
+    padding-left: 24px;
+  }
+  .rating-label {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .rating-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--on-dark);
+    line-height: 1.1;
+    font-family: var(--font-num);
+  }
+  .rating-value.hold { color: var(--primary); }
+  .rating-value.buy { color: var(--up); }
+  .rating-value.sell { color: var(--down); }
+  .rating-note {
+    color: var(--muted-strong);
+    font-size: 12px;
+  }
+  .badge-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .badge-up { background: rgba(14, 203, 129, 0.12); color: var(--up); }
+  .badge-down { background: rgba(246, 70, 93, 0.12); color: var(--down); }
+  .badge-neutral { background: var(--surface-elevated); color: var(--muted-strong); }
+  .badge-primary { background: rgba(252, 213, 53, 0.12); color: var(--primary); }
+
+  /* ===== Section ===== */
+  section {
+    margin-bottom: 48px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .section-num {
+    color: var(--primary);
+    font-family: var(--font-num);
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 8px;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--on-dark);
+    margin: 0;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  p {
+    color: var(--body);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 12px;
+  }
+  .lead {
+    color: var(--body);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  /* ===== Cards ===== */
+  .card {
+    background: var(--surface-card);
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--hairline);
+  }
+  .card + .card { margin-top: 12px; }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--on-dark);
+    margin-bottom: 8px;
+  }
+  .card-body {
+    color: var(--body);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ===== Grid ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+  /* ===== Stat cards ===== */
+  .stat {
+    background: var(--surface-card);
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid var(--hairline);
+  }
+  .stat-label {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: var(--font-num);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--on-dark);
+    line-height: 1.1;
+  }
+  .stat-delta {
+    font-family: var(--font-num);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .delta-up { color: var(--up); }
+  .delta-down { color: var(--down); }
+  .delta-neutral { color: var(--muted-strong); }
+
+  /* ===== Table ===== */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface-card);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+  }
+  table.data th {
+    text-align: left;
+    padding: 12px 16px;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--surface-elevated);
+  }
+  table.data td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--body);
+    font-size: 13px;
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td.num {
+    font-family: var(--font-num);
+    font-weight: 500;
+    text-align: right;
+  }
+  table.data td.label {
+    color: var(--muted-strong);
+    font-weight: 500;
+  }
+
+  /* ===== Score bar ===== */
+  .score-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 40px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .score-row:last-child { border-bottom: none; }
+  .score-name { color: var(--body); font-size: 13px; }
+  .score-track {
+    height: 6px;
+    background: var(--surface-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .score-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--primary-active), var(--primary));
+    border-radius: 3px;
+  }
+  .score-num {
+    color: var(--primary);
+    font-family: var(--font-num);
+    font-weight: 600;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  /* ===== Scenario ===== */
+  .scenario {
+    border-left: 3px solid var(--hairline);
+    padding: 16px 20px;
+    background: var(--surface-card);
+    border-radius: 0 8px 8px 0;
+  }
+  .scenario.bull { border-left-color: var(--up); }
+  .scenario.bear { border-left-color: var(--down); }
+  .scenario-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .scenario-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .scenario.bull .scenario-title { color: var(--up); }
+  .scenario.bear .scenario-title { color: var(--down); }
+  .scenario-target {
+    font-family: var(--font-num);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .scenario.bull .scenario-target { color: var(--up); }
+  .scenario.bear .scenario-target { color: var(--down); }
+  .scenario-body {
+    color: var(--body);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline);
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .footer strong { color: var(--muted-strong); }
+
+  /* ===== Conclusion ===== */
+  .conclusion {
+    background: linear-gradient(135deg, rgba(252, 213, 53, 0.06), rgba(252, 213, 53, 0.02));
+    border: 1px solid rgba(252, 213, 53, 0.2);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .conclusion-eyebrow {
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .conclusion p {
+    color: var(--body);
+    line-height: 1.7;
+    font-size: 14px;
+  }
+
+  ul.clean {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+  ul.clean li {
+    padding: 6px 0 6px 18px;
+    position: relative;
+    color: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  ul.clean li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 5px; height: 5px;
+    background: var(--primary);
+    border-radius: 50%;
+  }
+
+  /* ===== Mobile ===== */
+  @media (max-width: 768px) {
+    .wrapper { padding: 20px 16px 60px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 17px; }
+    .rating-box { padding: 20px; }
+    .rating-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+    .rating-cell + .rating-cell { padding-left: 0; border-left: none; }
+    .rating-cell:nth-child(odd) { padding-right: 16px; border-right: 1px solid var(--hairline); }
+    .rating-cell:nth-child(n+3) { padding-top: 20px; border-top: 1px solid var(--hairline); margin-top: 4px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-value { font-size: 18px; }
+    .header { flex-direction: column; align-items: flex-start; }
+    .report-meta { text-align: left; }
+    .score-row { grid-template-columns: 110px 1fr 36px; gap: 8px; }
+    .score-name { font-size: 12px; }
+    table.data th, table.data td { padding: 10px 12px; font-size: 12px; }
+    table.data th { font-size: 10px; }
+  }
+  @media (max-width: 480px) {
+    .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">GS</div>
+      <div>
+        <div class="brand-title">Equity Research</div>
+        <div class="brand-sub">Goldman Sachs Style · Institutional Note</div>
+      </div>
+    </div>
+    <div class="report-meta">
+      Report Date: <strong>2026-05-26</strong><br/>
+      Analyst: Senior Equity Research · 20Y<br/>
+      Coverage: <strong>Industrial Robotics (Korea)</strong>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="title-block">
+    <div class="title-eyebrow">Initiation of Coverage · 펀더멘털 분석</div>
+    <h1>나우로보틱스 — 자본잠식·합병·CAPA 4배 확장이 동시에 진행되는 고변동 로봇 스몰캡</h1>
+    <div class="subtitle">
+      <span class="ticker-pill">KOSDAQ 459510</span>
+      산업용 로봇 / 자동화 시스템 · 코스닥 상장(2025.05.08) · 시가총액 약 4,055억원
+    </div>
+  </div>
+
+  <!-- Rating Box -->
+  <div class="rating-box">
+    <div class="rating-grid">
+      <div class="rating-cell">
+        <div class="rating-label">Recommendation</div>
+        <div class="rating-value hold">HOLD</div>
+        <div class="rating-note">중립 / 확신도 中</div>
+        <div class="badge-row">
+          <span class="badge badge-primary">High Risk</span>
+          <span class="badge badge-neutral">Small Cap</span>
+        </div>
+      </div>
+      <div class="rating-cell">
+        <div class="rating-label">현재가 (2026-05-22)</div>
+        <div class="rating-value">26,350<span style="font-size:14px; color:var(--muted-strong);"> 원</span></div>
+        <div class="stat-delta delta-up">+200원 (+0.76%)</div>
+      </div>
+      <div class="rating-cell">
+        <div class="rating-label">12M 목표주가</div>
+        <div class="rating-value">28,000<span style="font-size:14px; color:var(--muted-strong);"> 원</span></div>
+        <div class="rating-note">Upside +6.3% (블렌딩)</div>
+      </div>
+      <div class="rating-cell">
+        <div class="rating-label">시가총액 / 섹터</div>
+        <div class="rating-value" style="font-size:22px;">₩4,055억</div>
+        <div class="rating-note">Industrials / Robotics</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. Business Model -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">01</span>비즈니스 모델 분석</h2>
+      <span class="section-sub">How the company makes money</span>
+    </div>
+    <p class="lead">
+      나우로보틱스는 산업용 다관절 로봇(6축), 물류·이송 자동화 시스템, 그리고 로봇 말단장치(E.O.A.T)를
+      자체 설계·제조하여 자동차 부품, 가전, 2차전지, 식음료 등 제조업 고객사에 턴키 방식으로 공급하는
+      <strong style="color:var(--on-dark);">산업용 로봇 메이커</strong>입니다.
+      2016년 이종주 대표가 한양로보틱스 영업·기술 출신 경력을 바탕으로 창업하였고, 2025년 5월
+      코스닥 시장에 상장한 신규 IPO 종목입니다. 핵심 부품인 감속기를 내재화하면서 원가율 절감을 시도하고
+      있으며, 합리적 가격을 무기로 중소·중견 제조사 풋프린트를 확장 중입니다.
+    </p>
+  </section>
+
+  <!-- 2. Revenue Mix -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">02</span>수익원 — 세그먼트 기여도</h2>
+      <span class="section-sub">2025E 매출 믹스 · 별도 기준</span>
+    </div>
+    <div class="grid-4">
+      <div class="stat">
+        <div class="stat-label">산업용 로봇</div>
+        <div class="stat-value">60.0%</div>
+        <div class="stat-delta delta-up">핵심 성장 드라이버</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">자동화 시스템</div>
+        <div class="stat-value">27.6%</div>
+        <div class="stat-delta delta-neutral">턴키 SI</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">E.O.A.T</div>
+        <div class="stat-value">6.3%</div>
+        <div class="stat-delta delta-neutral">로봇 말단장치</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">상품 매출</div>
+        <div class="stat-value">6.0%</div>
+        <div class="stat-delta delta-neutral">유통/부품</div>
+      </div>
+    </div>
+    <p style="margin-top:16px;">
+      성장 궤적의 핵심은 (1) 2026년 2월 준공 예정인 제2공장으로 인한 <strong style="color:var(--primary);">CAPA 4배 확장(300억→1,200억)</strong>,
+      (2) 고객사 수 급증(2020년 126개 → 2025년말 기준 682개), (3) 한양로보틱스 흡수합병을 통한 사출기 자동화 라인업 확보입니다.
+      매출 증가의 대부분은 산업용 로봇 비중 확대에서 발생할 것으로 예상되며, 협동로봇·휴머노이드·AI 기반 라인업으로의 확장이
+      미래 옵션 가치로 평가됩니다.
+    </p>
+  </section>
+
+  <!-- 3. Profitability -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">03</span>수익성 분석 — 마진 추세</h2>
+      <span class="section-sub">개별 기준 / 단위: 억원</span>
+    </div>
+    <table class="data">
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th style="text-align:right;">2023A</th>
+          <th style="text-align:right;">2024A</th>
+          <th style="text-align:right;">2025E</th>
+          <th style="text-align:right;">2026E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">매출액</td>
+          <td class="num">약 104</td>
+          <td class="num">120.6</td>
+          <td class="num">약 150</td>
+          <td class="num" style="color:var(--up);">215~255</td>
+        </tr>
+        <tr>
+          <td class="label">YoY 성장률</td>
+          <td class="num">-</td>
+          <td class="num" style="color:var(--up);">+15.9%</td>
+          <td class="num" style="color:var(--up);">약 +24%</td>
+          <td class="num" style="color:var(--up);">+43%~+70%</td>
+        </tr>
+        <tr>
+          <td class="label">영업이익</td>
+          <td class="num" style="color:var(--down);">-54.7</td>
+          <td class="num" style="color:var(--down);">-28.6</td>
+          <td class="num" style="color:var(--down);">-82</td>
+          <td class="num" style="color:var(--up);">약 +15 (BEP±)</td>
+        </tr>
+        <tr>
+          <td class="label">영업이익률</td>
+          <td class="num" style="color:var(--down);">-52.6%</td>
+          <td class="num" style="color:var(--down);">-23.7%</td>
+          <td class="num" style="color:var(--down);">-54%</td>
+          <td class="num" style="color:var(--primary);">+6~+7%</td>
+        </tr>
+        <tr>
+          <td class="label">예상 원가율</td>
+          <td class="num">약 80%</td>
+          <td class="num">약 75%</td>
+          <td class="num">약 74%</td>
+          <td class="num" style="color:var(--up);">약 60%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;">
+      <strong style="color:var(--on-dark);">2025년에는 IPO 직후 비용 확대와 2공장 선제 투자로 손실이 일시 확대</strong>되었으나,
+      2026년 2공장 가동·감속기 내재화 효과로 원가율이 60% 수준으로 급격히 하락할 것으로 회사·증권사
+      전망이 모이고 있습니다. 다만 BEP 달성은 "전망"이지 "실적"이 아니므로, 분기 실적에서
+      <strong style="color:var(--down);">원가율 60%대 진입과 영업이익 흑자전환을 동시 확인</strong>하는 것이 트레이딩 트리거입니다.
+    </p>
+  </section>
+
+  <!-- 4. Balance Sheet -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">04</span>대차대조표 건전성 — 자본잠식 리스크</h2>
+      <span class="section-sub">2025-12-31 기준 잠정 (별도)</span>
+    </div>
+    <div class="grid-3">
+      <div class="stat">
+        <div class="stat-label">자산총계</div>
+        <div class="stat-value">173.8억</div>
+        <div class="stat-delta delta-neutral">현금성·재고·설비</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">부채총계</div>
+        <div class="stat-value" style="color:var(--down);">275.9억</div>
+        <div class="stat-delta delta-down">부채 &gt; 자산</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">자기자본</div>
+        <div class="stat-value" style="color:var(--down);">-102억</div>
+        <div class="stat-delta delta-down">완전자본잠식</div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px; border-left:3px solid var(--down);">
+      <div class="card-title" style="color:var(--down);">⚠ 관리종목 지정 리스크 — 가장 큰 단일 위험</div>
+      <div class="card-body">
+        2025년말 기준 별도 재무에서 부채총계가 자산총계를 초과해 <strong style="color:var(--on-dark);">완전자본잠식</strong>
+        상태에 진입한 것으로 보도되었습니다. 한양로보틱스 흡수합병(75억 인수, 합병기일 2026-06-30)이
+        자본잠식 해소 또는 추가 부담으로 작용할지가 6월 이후 가장 중요한 변수이며, 자본확충이 동반되지 않으면
+        <strong style="color:var(--down);">코스닥 관리종목 지정 가능성</strong>이 거론됩니다. 이는 거래 정지·기관 매도 트리거가 될 수
+        있어, 포지션 사이즈를 평소 대비 <strong style="color:var(--primary);">1/2~1/3로 축소</strong>해야 하는 결정적 사유입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Free Cash Flow -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">05</span>자유현금흐름 — 투자기 진행 중</h2>
+      <span class="section-sub">FCF Yield · CapEx Cycle</span>
+    </div>
+    <p>
+      현재 영업적자 + 제2공장 CapEx 집행 + 한양로보틱스 인수대금(75억)이 겹치면서
+      <strong style="color:var(--down);">FCF는 명백히 마이너스 구간</strong>입니다.
+      FCF 수익률(FCF Yield) 산정 자체가 무의미한 단계이며, 향후 12개월간 회사 가치 변화는
+      "FCF 창출"이 아니라 "자본 배분과 유동성 관리"에 의해 좌우됩니다.
+    </p>
+    <ul class="clean">
+      <li>자본 배분 우선순위: ① 2공장 가동 안정화 → ② 합병법인(舊 한양로보틱스) 정상화 → ③ 감속기 내재화 R&amp;D</li>
+      <li>배당: 미실시. 신주발행 없는 소규모합병이나 자본확충 가능성은 별도 모니터링 필요</li>
+      <li>현금흐름 흑자전환 시기: 빨라야 2026년 하반기 분기 단위, 연간 흑전은 2027년 시나리오</li>
+    </ul>
+  </section>
+
+  <!-- 6. Competitive Advantage -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">06</span>경쟁 우위 (Moat) — 10점 스코어카드</h2>
+      <span class="section-sub">Pricing Power · Brand · Switching Cost · Network Effect</span>
+    </div>
+    <div class="card">
+      <div class="score-row">
+        <div class="score-name">가격 결정력</div>
+        <div class="score-track"><div class="score-fill" style="width:30%;"></div></div>
+        <div class="score-num">3/10</div>
+      </div>
+      <div class="score-row">
+        <div class="score-name">브랜드 강도</div>
+        <div class="score-track"><div class="score-fill" style="width:40%;"></div></div>
+        <div class="score-num">4/10</div>
+      </div>
+      <div class="score-row">
+        <div class="score-name">전환 비용</div>
+        <div class="score-track"><div class="score-fill" style="width:60%;"></div></div>
+        <div class="score-num">6/10</div>
+      </div>
+      <div class="score-row">
+        <div class="score-name">네트워크 효과</div>
+        <div class="score-track"><div class="score-fill" style="width:20%;"></div></div>
+        <div class="score-num">2/10</div>
+      </div>
+      <div class="score-row">
+        <div class="score-name">기술 내재화(감속기)</div>
+        <div class="score-track"><div class="score-fill" style="width:60%;"></div></div>
+        <div class="score-num">6/10</div>
+      </div>
+      <div class="score-row">
+        <div class="score-name">고객사 베이스(682개)</div>
+        <div class="score-track"><div class="score-fill" style="width:70%;"></div></div>
+        <div class="score-num">7/10</div>
+      </div>
+    </div>
+    <p style="margin-top:14px;">
+      가장 큰 강점은 <strong style="color:var(--primary);">434건의 자동화 레퍼런스와 5년 만에 5배 이상 증가한 고객사 베이스</strong>이며,
+      현대모비스·서진오토모티브·인지컨트롤스 등 1차 벤더와의 실적은 신뢰성의 근거가 됩니다.
+      반대로 두산로보틱스·레인보우로보틱스 등 대기업·연구소 기반 경쟁자 대비 브랜드·자본력에서 열위에 있어,
+      <strong>가격 경쟁력에 의존한 영업이 마진을 제약</strong>하는 구조적 약점이 존재합니다.
+    </p>
+  </section>
+
+  <!-- 7. Management -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">07</span>경영진 품질</h2>
+      <span class="section-sub">Capital Allocation Track Record</span>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">이종주 대표이사</div>
+        <div class="card-body">
+          한양로보틱스 평사원 입사 후 12년간 현장·영업·기술 트랙을 거치며 산업용 로봇 도메인 지식을 축적.
+          2016년 나우로보틱스를 창업해 9년 만에 코스닥 상장사로 성장시켰고, 2026년 한양로보틱스
+          역인수(흡수합병)를 주도한 창업가형 CEO. <strong style="color:var(--on-dark);">현장 영업 강점</strong>이
+          고객사 베이스 확장의 동력입니다.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">자본 배분 관전 포인트</div>
+        <div class="card-body">
+          75억원의 한양로보틱스 인수는 자본잠식 회사를 떠안는 부담을 감수한 결정. PER이 의미를 잃은 단계에서
+          <strong style="color:var(--primary);">"이 인수가 매출 시너지로 회수될 수 있는지"</strong>가 12개월 내
+          평가받게 됩니다. 합병 후 통합 비용·인력 재편 결과가 2026년 4분기 실적부터 가시화될 것으로 보입니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Valuation -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">08</span>밸류에이션 스냅샷</h2>
+      <span class="section-sub">Adj. PSR Approach (적자기업)</span>
+    </div>
+    <table class="data">
+      <thead>
+        <tr>
+          <th>지표</th>
+          <th style="text-align:right;">현재</th>
+          <th style="text-align:right;">5년 평균</th>
+          <th style="text-align:right;">국내 로봇 피어</th>
+          <th style="text-align:right;">코멘트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="label">PER</td>
+          <td class="num" style="color:var(--muted-strong);">N/A</td>
+          <td class="num">N/A</td>
+          <td class="num">N/A~수백배</td>
+          <td>적자기업, 분모 음수</td>
+        </tr>
+        <tr>
+          <td class="label">PSR (Trailing)</td>
+          <td class="num" style="color:var(--down);">약 33.6x</td>
+          <td class="num">상장 1년차</td>
+          <td class="num">10~25x</td>
+          <td style="color:var(--down);">피어 대비 명백한 프리미엄</td>
+        </tr>
+        <tr>
+          <td class="label">PSR (2026E)</td>
+          <td class="num" style="color:var(--primary);">약 17.2x</td>
+          <td class="num">-</td>
+          <td class="num">10~25x</td>
+          <td>가이던스 적중 시 정당화 가능</td>
+        </tr>
+        <tr>
+          <td class="label">EV/EBITDA</td>
+          <td class="num" style="color:var(--muted-strong);">N/A</td>
+          <td class="num">N/A</td>
+          <td class="num">25~40x</td>
+          <td>EBITDA 음수</td>
+        </tr>
+        <tr>
+          <td class="label">시총/CAPA(2026E)</td>
+          <td class="num">0.34x</td>
+          <td class="num">-</td>
+          <td class="num">-</td>
+          <td style="color:var(--primary);">CAPA 풀로딩 가정 시 매력</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;">
+      현재 주가는 <strong style="color:var(--down);">2025년 매출 기준 PSR이 30x를 상회</strong>하여 명백히 비싸지만,
+      2026년 매출 전망(215~255억원)을 적중시키면 PSR 17x 수준으로 정상화되어 국내 로봇 피어 밴드 상단에 진입합니다.
+      즉, <strong style="color:var(--on-dark);">현 주가는 2026년 가이던스의 완전한 적중을 이미 반영</strong>하고 있으며,
+      미달 시 즉각적인 디레이팅 위험이 존재합니다.
+    </p>
+  </section>
+
+  <!-- 9. Scenarios -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">09</span>강세·약세 시나리오 — 12개월 목표가</h2>
+      <span class="section-sub">Bull / Base / Bear Cases</span>
+    </div>
+    <div class="grid-2">
+      <div class="scenario bull">
+        <div class="scenario-head">
+          <div class="scenario-title">▲ 강세 시나리오</div>
+          <div class="scenario-target">38,000원 (+44%)</div>
+        </div>
+        <div class="scenario-body">
+          (1) 2공장 정상 가동 + 한양로보틱스 통합 성공 → 2026년 매출 250억+ 달성<br/>
+          (2) 2026 하반기 분기 영업이익 흑자전환 가시화<br/>
+          (3) 자본잠식이 합병·자본확충으로 해소되며 관리종목 리스크 종결<br/>
+          (4) 휴머노이드·협동로봇 라인업 공개로 멀티플 리레이팅
+        </div>
+      </div>
+      <div class="scenario bear">
+        <div class="scenario-head">
+          <div class="scenario-title">▼ 약세 시나리오</div>
+          <div class="scenario-target">15,500원 (-41%)</div>
+        </div>
+        <div class="scenario-body">
+          (1) 자본잠식 해소 실패 → <strong style="color:var(--down);">관리종목 지정 / 거래정지</strong> 트리거<br/>
+          (2) 2공장 가동률 부진으로 원가율 하락 지연, 2026년 매출 200억 하회<br/>
+          (3) 한양로보틱스 통합 비용으로 합병 후 손실 확대<br/>
+          (4) 로봇 섹터 모멘텀 약화 + 신규 IPO 보호예수 해제 매도 압력
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px; border-left:3px solid var(--primary);">
+      <div class="card-title" style="color:var(--primary);">기본 시나리오 — 목표가 28,000원 (+6%)</div>
+      <div class="card-body">
+        2026년 매출 230억(컨센서스 중간값), 매출 2배 확대에도 자본잠식 해소 과정의 불확실성이 멀티플 확장을 제한합니다.
+        분기 흑자전환이 1번 확인되는 시점에 본격적인 리레이팅이 시작될 가능성이 높습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Conclusion -->
+  <section>
+    <div class="section-head">
+      <h2><span class="section-num">10</span>결론 — Recommendation</h2>
+      <span class="section-sub">One-Paragraph Verdict</span>
+    </div>
+    <div class="conclusion">
+      <div class="conclusion-eyebrow">Investment Verdict · HOLD · Confidence: Medium</div>
+      <p>
+        나우로보틱스는 <strong style="color:var(--on-dark);">"4배 CAPA 확장 × 합병 × 자본잠식"이 동시에 진행되는
+        고변동 스몰캡</strong>으로, 2026년 매출 2배 성장과 분기 흑자전환이라는 매력적 시나리오를 보유하지만
+        <strong style="color:var(--down);">자본잠식·관리종목 리스크</strong>가 가장 큰 단일 위협으로 남아 있습니다.
+        현 주가(26,350원)는 2026년 가이던스 적중을 이미 상당 부분 반영한 수준이라 단기 업사이드가 제한적이며,
+        다운사이드는 -40%까지 열려 있어 <strong style="color:var(--primary);">위험-보상비(R/R)가 기관 매수에는 비대칭적으로 불리</strong>합니다.
+        포지션은 평소의 1/3 사이즈로 축소해 보유하고, 2026년 6월 30일 합병기일·자본확충 공시·2026 2Q
+        실적(8월) 세 가지 이벤트를 통과한 뒤 비중 확대 또는 청산을 결정할 것을 권고합니다. 손절선은 22,000원
+        (52주 저점 부근), 추격 매수는 분기 영업이익 흑자전환 확인 이후로 한정합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- Sources -->
+  <div class="footer">
+    <strong>Sources &amp; Disclosures</strong><br/>
+    · 하나증권 스몰캡 리포트(2025-09-01) — 해외시장 진출을 통해 성장 드라이브 확대<br/>
+    · FnGuide Company Guide(A459510) Snapshot &amp; 재무제표<br/>
+    · 디지털투데이(2026-04-29): 나우로보틱스, 한양로보틱스 흡수합병 결정<br/>
+    · 딜사이트(2026): 자본잠식 리스크 감수한 적자기업 인수 / 관리종목 리스크<br/>
+    · 아시아경제 CORE(2025-09-01): 해외시장 진출로 성장 드라이브 확대<br/>
+    · PMSTORYHUB(2026): 나우로보틱스 주가 분석 — 35,000원 고지 반등 신호<br/>
+    <br/>
+    <strong>Disclaimer</strong> — 본 보고서는 골드만 삭스 스타일을 모방한 교육·분석 목적의 시뮬레이션이며 실제 골드만 삭스의
+    리서치가 아닙니다. 투자 권유가 아니며, 모든 투자 결정의 책임은 투자자 본인에게 있습니다. 자본잠식·관리종목 리스크가 존재하는
+    종목이므로 본인의 위험 감내 수준을 반드시 점검하시기 바랍니다.
+  </div>
+
+</div>
+</body>
+</html>
