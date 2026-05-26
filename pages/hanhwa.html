@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한화투자증권(003530) | Goldman Sachs Style Fundamental Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --canvas-dark:#0b0e11;
+    --surface-card-dark:#1e2329;
+    --surface-elevated-dark:#2b3139;
+    --hairline-on-dark:#2b3139;
+    --primary:#FCD535;
+    --primary-active:#f0b90b;
+    --on-primary:#181a20;
+    --on-dark:#ffffff;
+    --body:#eaecef;
+    --muted:#707a8a;
+    --muted-strong:#929aa5;
+    --trading-up:#0ecb81;
+    --trading-down:#f6465d;
+    --info:#3b82f6;
+    --r-md:6px;
+    --r-lg:8px;
+    --r-xl:12px;
+    --r-pill:9999px;
+    --sp-xxs:4px;--sp-xs:8px;--sp-sm:12px;--sp-md:16px;--sp-lg:24px;--sp-xl:32px;--sp-xxl:48px;--sp-section:80px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--canvas-dark);color:var(--body);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;}
+  .num{font-family:'JetBrains Mono','IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+  .container{max-width:1080px;margin:0 auto;padding:var(--sp-xl) var(--sp-lg);}
+
+  /* Top bar */
+  .topnav{
+    background:var(--canvas-dark);
+    border-bottom:1px solid var(--hairline-on-dark);
+    padding:var(--sp-md) var(--sp-lg);
+    display:flex;align-items:center;justify-content:space-between;gap:var(--sp-md);
+  }
+  .brand{color:var(--primary);font-weight:700;letter-spacing:.5px;font-size:14px;}
+  .nav-meta{color:var(--muted);font-size:12px;}
+
+  /* Hero */
+  .hero{padding:var(--sp-xxl) 0 var(--sp-xl) 0;}
+  .eyebrow{
+    display:inline-block;background:var(--surface-card-dark);color:var(--primary);
+    border-radius:var(--r-pill);padding:6px 14px;font-size:12px;font-weight:600;letter-spacing:.6px;
+    text-transform:uppercase;margin-bottom:var(--sp-md);
+  }
+  h1.title{
+    font-size:40px;line-height:1.1;letter-spacing:-.3px;font-weight:700;
+    margin:0 0 var(--sp-sm) 0;color:var(--on-dark);
+  }
+  .subtitle{color:var(--muted-strong);font-size:15px;margin:0 0 var(--sp-lg) 0;}
+
+  /* Rating box */
+  .rating-card{
+    background:var(--surface-card-dark);
+    border-radius:var(--r-xl);
+    padding:var(--sp-lg);
+    display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-md);
+    margin-bottom:var(--sp-xl);
+  }
+  .rating-card .cell .label{font-size:11px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;}
+  .rating-card .cell .value{font-size:20px;font-weight:700;color:var(--on-dark);}
+  .rating-card .cell .value.num{font-family:'JetBrains Mono',monospace;}
+  .badge-buy{display:inline-block;background:var(--trading-up);color:#0a1c14;font-weight:700;font-size:13px;padding:5px 10px;border-radius:var(--r-sm,4px);}
+  .badge-hold{display:inline-block;background:var(--primary);color:var(--on-primary);font-weight:700;font-size:13px;padding:5px 10px;border-radius:4px;}
+  .badge-sell{display:inline-block;background:var(--trading-down);color:#1c0a0e;font-weight:700;font-size:13px;padding:5px 10px;border-radius:4px;}
+
+  /* Section */
+  section{margin-bottom:var(--sp-xl);}
+  h2.section-title{
+    font-size:22px;font-weight:600;color:var(--on-dark);margin:0 0 var(--sp-md) 0;
+    display:flex;align-items:center;gap:var(--sp-sm);
+  }
+  h2.section-title .idx{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:28px;height:28px;background:var(--primary);color:var(--on-primary);
+    border-radius:var(--r-md);font-size:14px;font-weight:700;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .card{
+    background:var(--surface-card-dark);
+    border-radius:var(--r-xl);
+    padding:var(--sp-lg);
+    margin-bottom:var(--sp-md);
+  }
+  .card p{margin:0 0 var(--sp-sm) 0;color:var(--body);font-size:14px;}
+  .card p:last-child{margin-bottom:0;}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  table th,table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--hairline-on-dark);}
+  table th{color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;}
+  table td{color:var(--body);}
+  table td.num,table th.num{font-family:'JetBrains Mono',monospace;text-align:right;font-variant-numeric:tabular-nums;}
+  .up{color:var(--trading-up);}
+  .down{color:var(--trading-down);}
+
+  /* Bullet list inside cards */
+  ul.bullets{margin:0;padding-left:18px;}
+  ul.bullets li{margin-bottom:6px;color:var(--body);font-size:14px;}
+  ul.bullets li:last-child{margin-bottom:0;}
+
+  /* Scenario grid */
+  .scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-md);}
+  .scenario{background:var(--surface-elevated-dark);border-radius:var(--r-lg);padding:var(--sp-md);}
+  .scenario .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-xs);}
+  .scenario .head .label{font-size:12px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;}
+  .scenario .head .price{font-family:'JetBrains Mono',monospace;font-weight:700;}
+  .scenario ul{margin:6px 0 0;padding-left:18px;}
+  .scenario ul li{font-size:13px;color:var(--body);margin-bottom:4px;}
+
+  /* Stat strip */
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-sm);margin-bottom:var(--sp-xl);}
+  .stat{background:var(--surface-card-dark);border-radius:var(--r-lg);padding:var(--sp-md);}
+  .stat .l{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+  .stat .v{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--on-dark);}
+  .stat .d{font-size:12px;color:var(--muted-strong);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+
+  /* Conclusion */
+  .conclusion{
+    background:var(--surface-card-dark);
+    border-left:4px solid var(--primary);
+    border-radius:var(--r-lg);
+    padding:var(--sp-lg);
+    margin-bottom:var(--sp-xl);
+  }
+  .conclusion h3{margin:0 0 var(--sp-xs) 0;color:var(--primary);font-size:14px;letter-spacing:.5px;text-transform:uppercase;}
+  .conclusion p{margin:0;color:var(--body);font-size:14px;line-height:1.65;}
+
+  /* Footer */
+  footer{
+    border-top:1px solid var(--hairline-on-dark);
+    margin-top:var(--sp-xl);
+    padding:var(--sp-lg) 0;
+    font-size:12px;color:var(--muted);
+  }
+  footer a{color:var(--primary);text-decoration:none;}
+
+  /* Mobile */
+  @media (max-width: 768px){
+    .container{padding:var(--sp-md);}
+    .hero{padding:var(--sp-xl) 0 var(--sp-md) 0;}
+    h1.title{font-size:28px;}
+    .subtitle{font-size:14px;}
+    .rating-card{grid-template-columns:repeat(2,1fr);}
+    .stat-strip{grid-template-columns:repeat(2,1fr);}
+    .scenario-grid{grid-template-columns:1fr;}
+    .table-wrap{overflow-x:auto;}
+    table{min-width:520px;}
+    h2.section-title{font-size:18px;}
+    .card{padding:var(--sp-md);}
+  }
+</style>
+</head>
+<body>
+
+<header class="topnav">
+  <div class="brand">GOLDMAN SACHS · EQUITY RESEARCH</div>
+  <div class="nav-meta">2026.05.26 KST</div>
+</header>
+
+<main class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="eyebrow">Korea Financials · Brokerage</div>
+    <h1 class="title">한화투자증권 (003530.KS)</h1>
+    <p class="subtitle">디지털자산 전환의 옵션 가치를 품은 중견 증권사 — RWA 허브 비전과 두나무 9.84% 지분이 만든 변곡점</p>
+  </div>
+
+  <!-- Rating Card -->
+  <div class="rating-card">
+    <div class="cell">
+      <div class="label">투자의견</div>
+      <div class="value"><span class="badge-hold">HOLD</span></div>
+    </div>
+    <div class="cell">
+      <div class="label">현재가 (5/12 종가)</div>
+      <div class="value num">₩7,570</div>
+    </div>
+    <div class="cell">
+      <div class="label">12개월 목표가</div>
+      <div class="value num">₩9,200</div>
+    </div>
+    <div class="cell">
+      <div class="label">기대 수익률</div>
+      <div class="value num up">+21.5%</div>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div class="stat-strip">
+    <div class="stat"><div class="l">1Q26 매출</div><div class="v">₩1.66조</div><div class="d">YoY +98.3%</div></div>
+    <div class="stat"><div class="l">1Q26 영업이익</div><div class="v">₩296억</div><div class="d down">YoY -37.1%</div></div>
+    <div class="stat"><div class="l">자기자본</div><div class="v">₩1.89조</div><div class="d">FY25</div></div>
+    <div class="stat"><div class="l">두나무 지분</div><div class="v">9.84%</div><div class="d">장부가 ~₩9,000억</div></div>
+  </div>
+
+  <!-- 1. 비즈니스 모델 -->
+  <section>
+    <h2 class="section-title"><span class="idx">1</span>비즈니스 모델</h2>
+    <div class="card">
+      <p>한화투자증권은 한화 그룹 계열의 <strong>중견 종합 증권사</strong>로, 위탁매매(Brokerage)·자산관리(WM)·자기매매(Trading)·기업금융(IB) 4대 축에 더해 최근 <strong>디지털자산·RWA 토큰화 사업</strong>을 미래 성장축으로 확장하고 있다.</p>
+      <p>전통 증권업의 시장 점유율은 미래에셋·한국투자·NH 등 초대형 IB 대비 낮지만, <strong>두나무(업비트 운영) 지분 9.84% 보유</strong>를 통해 사실상 한국 가상자산 시장의 인프라 익스포저를 보유한 유일무이한 상장 증권사라는 차별점을 갖는다.</p>
+    </div>
+  </section>
+
+  <!-- 2. 수익원 -->
+  <section>
+    <h2 class="section-title"><span class="idx">2</span>수익원 및 세그먼트 기여</h2>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>세그먼트</th><th class="num">최근 분기 추이</th><th>코멘트</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>자산관리 (WM)</td><td class="num up">성장 ↑</td><td>1Q26 핵심 성장 엔진, 차별화 상품 전략 통해 잔고·수수료 동반 확대</td></tr>
+            <tr><td>홀세일 (Wholesale)</td><td class="num up">성장 ↑</td><td>법인 영업 부문 안정적 성과</td></tr>
+            <tr><td>트레이딩</td><td class="num down">둔화 ↓</td><td>시장 변동성 확대로 운용 손익 변동성 확대</td></tr>
+            <tr><td>IB</td><td class="num down">위축 ↓</td><td>DCM·ECM 모두 시장 위축, 부동산 PF 익스포저 부담</td></tr>
+            <tr><td>디지털자산 / RWA</td><td class="num">신규 ★</td><td>두나무 지분평가익(2025년 +3,116억) 및 STO 플랫폼 구축 진행</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 수익성 -->
+  <section>
+    <h2 class="section-title"><span class="idx">3</span>수익성 분석</h2>
+    <div class="card">
+      <ul class="bullets">
+        <li><strong>FY2025 연간 당기순이익 ~₩1,000억</strong> (vs FY2024 ₩196억): 두나무 지분 평가이익이 큰 폭으로 기여하며 V자 회복.</li>
+        <li><strong>1Q26 영업이익률은 압축</strong>: 매출은 두 배 증가했으나 영업이익 -37%, 순이익 -48% — 운용 손익 변동성이 영업 단계에서 비용 부담을 키운 형국.</li>
+        <li>증권사 산업 평균 ROE 7~9% 대비 한화투자증권은 <strong>5~6%대 — 자본효율은 여전히 업종 평균 이하</strong>지만 지분평가익 반영분 포함 시 회계상 ROE는 일시적으로 8% 안팎까지 상승.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. 대차대조표 건전성 -->
+  <section>
+    <h2 class="section-title"><span class="idx">4</span>대차대조표 건전성</h2>
+    <div class="card">
+      <ul class="bullets">
+        <li>연결 총자산 <strong>₩16조 849억</strong>, 자기자본 <strong>₩1조 8,942억</strong> (FY25 기준).</li>
+        <li><strong>순자본비율 784%</strong> — 금융감독원 규제 하한(100%)을 큰 폭 상회, 자본 적정성은 매우 양호.</li>
+        <li>두나무 추가 취득 비용 ~₩5,978억 — 자본 부담은 있으나 신평사 평가상 "관리 가능 범위" 평가.</li>
+        <li>리스크: 부동산 PF 잔고와 해외 대체투자 평가손 — 업종 공통 노출이지만 자본 규모 대비 상대적 부담 존재.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. FCF -->
+  <section>
+    <h2 class="section-title"><span class="idx">5</span>자유현금흐름 분석</h2>
+    <div class="card">
+      <p>증권사 특성상 일반적 FCF 개념보다 <strong>영업활동 현금흐름</strong>과 <strong>자본활용 효율</strong>이 핵심 지표. 한화투자증권의 자본 배분 우선순위는 명확히 <em>디지털자산 사업 투자(두나무 지분 확대) → 자기주식 / 배당 → 신사업 인프라</em> 순으로 이동.</p>
+      <p>2026년 두나무 추가 취득(~₩5,978억)으로 단기 현금 유출은 컸으나, 지분가치 재평가 시 시가총액 대비 매우 큰 비중의 잠재 평가익을 내재 — 'Hidden Asset' 성격이 강함.</p>
+    </div>
+  </section>
+
+  <!-- 6. 경쟁우위 -->
+  <section>
+    <h2 class="section-title"><span class="idx">6</span>경쟁 우위 평가</h2>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>해자(Moat) 요소</th><th class="num">점수 (1~10)</th><th>근거</th></tr></thead>
+          <tbody>
+            <tr><td>브랜드 / 신뢰</td><td class="num">6</td><td>한화 그룹 후광, 다만 초대형 IB 대비 인지도 낮음</td></tr>
+            <tr><td>가격결정력</td><td class="num">4</td><td>위탁수수료 무료화 경쟁 노출, 차별화 어려움</td></tr>
+            <tr><td>전환비용</td><td class="num">5</td><td>WM 고객 락인은 평균 수준</td></tr>
+            <tr><td>네트워크 효과</td><td class="num down">3</td><td>거래 인프라 측면 네트워크 효과 제한적</td></tr>
+            <tr><td>희소 자산 (두나무)</td><td class="num up">9</td><td>국내 1위 가상자산 거래소 9.84% 지분 — 상장사 중 유일</td></tr>
+            <tr><td>RWA / STO 선점</td><td class="num up">8</td><td>제도화 시 수혜 1순위, 조직·시스템 선제 정비</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 경영진 -->
+  <section>
+    <h2 class="section-title"><span class="idx">7</span>경영진 품질</h2>
+    <div class="card">
+      <ul class="bullets">
+        <li><strong>장병호 대표 체제</strong>: 2026년 경영전략회의에서 "글로벌 No.1 RWA Hub" 비전 공식 선포 — 전략 방향이 명확하고 일관됨.</li>
+        <li>조직 개편: '미래전략실' 신설(STO·온체인 총괄), 디지털혁신 부문 격상 — 인적·자본 자원 배분이 비전과 정합.</li>
+        <li>자본 배분 실적: 두나무 초기 취득가 ₩583억 → 2025년 말 장부가 ₩7,112억으로 약 12배 — 과거 단일 의사결정 중 가장 성공적인 자본 배분 사례.</li>
+        <li>그룹 차원의 한화 거버넌스 리스크는 시장이 일정 부분 디스카운트로 반영하는 영역.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 8. 밸류에이션 -->
+  <section>
+    <h2 class="section-title"><span class="idx">8</span>밸류에이션 스냅샷</h2>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>지표</th><th class="num">현재</th><th class="num">5Y 평균</th><th class="num">증권업 피어</th><th>해석</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>주가</td><td class="num">₩7,570</td><td class="num">~₩6,500</td><td class="num">—</td><td>52주 박스권 상단</td></tr>
+            <tr><td>P/B (자기자본 기준)</td><td class="num">~0.55x</td><td class="num">0.45x</td><td class="num">0.50~0.70x</td><td>피어 중위권</td></tr>
+            <tr><td>P/E (FY25 기준)</td><td class="num">~14x</td><td class="num">변동성 큼</td><td class="num">8~12x</td><td>두나무 평가익 일회성 영향</td></tr>
+            <tr><td>두나무 지분가치 / 시가총액</td><td class="num up">≈ 60~70%</td><td class="num">—</td><td class="num">—</td><td>시총의 상당 부분이 두나무 지분으로 설명</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:var(--sp-md);color:var(--muted-strong);font-size:13px;">※ Sum-of-the-Parts 관점: 두나무 지분가치(~₩9,000억) + 본업 가치(자기자본 - 두나무 장부가 ≈ ₩1.18조에 0.4~0.5x 적용) = ₩13,700~14,900억 → 시가총액 대비 약 20~30% 업사이드.</p>
+    </div>
+  </section>
+
+  <!-- 9. 시나리오 -->
+  <section>
+    <h2 class="section-title"><span class="idx">9</span>강세 / 약세 시나리오 (12M)</h2>
+    <div class="scenario-grid">
+      <div class="scenario">
+        <div class="head"><span class="label up">▲ Bull Case</span><span class="price up">₩11,500</span></div>
+        <ul>
+          <li>비트코인 강세 → 두나무 평가가치 추가 상승</li>
+          <li>STO 제도화 및 RWA 플랫폼 상용화</li>
+          <li>WM 잔고 두 자릿수 성장 지속</li>
+          <li>PF 익스포저 안정화</li>
+        </ul>
+      </div>
+      <div class="scenario">
+        <div class="head"><span class="label down">▼ Bear Case</span><span class="price down">₩5,800</span></div>
+        <ul>
+          <li>가상자산 시장 침체 → 두나무 평가손</li>
+          <li>STO 제도화 지연</li>
+          <li>금리·시장 변동성 확대로 운용손익 악화</li>
+          <li>부동산 PF 추가 손실 인식</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. 결론 -->
+  <section>
+    <h2 class="section-title"><span class="idx">10</span>결론 및 등급</h2>
+    <div class="conclusion">
+      <h3>HOLD · 12M Target ₩9,200 · Conviction: Medium</h3>
+      <p>한화투자증권은 본업의 수익성 회복 속도와 두나무 지분가치라는 두 개의 트리거를 가진 <strong>"양면성 종목"</strong>이다. 본업만으로는 피어 대비 차별점이 약하지만, <strong>두나무 9.84% 지분 + RWA 허브 비전</strong>이 일종의 옵션 가치를 제공한다. 현 주가는 본업 P/B 0.55x 수준에 두나무 가치가 부분 반영된 상태로, Sum-of-the-Parts 기준 약 20~30% 업사이드가 존재하나 <strong>가상자산 시장과 STO 제도화 일정에 따른 변동성이 크다</strong>. 적극 매수는 BTC·정책 모멘텀이 결합되는 구간에서 권고하며, 현 시점에서는 <strong>HOLD</strong>로 분할 매수 / 일부 익절 전략이 적절하다. 손절은 ₩6,800 이탈 시 검토.</p>
+    </div>
+  </section>
+
+  <!-- 출처 -->
+  <section>
+    <h2 class="section-title"><span class="idx">※</span>주요 출처</h2>
+    <div class="card">
+      <ul class="bullets">
+        <li><a style="color:var(--primary);" href="https://www.digitaltoday.co.kr/news/articleView.html?idxno=664931">디지털투데이 · 1Q26 매출 1.66조 +98.3%</a></li>
+        <li><a style="color:var(--primary);" href="https://byline.network/2026/05/0520-7/">바이라인 · 두나무 지분 9.84% 확대, RWA 허브 전략</a></li>
+        <li><a style="color:var(--primary);" href="https://news.bizwatch.co.kr/article/market/2026/05/21/0003">비즈워치 · 두나무 3대주주 등극, 실적 돌파구</a></li>
+        <li><a style="color:var(--primary);" href="https://www.whitepaper.co.kr/news/articleView.html?idxno=255938">화이트페이퍼 · 글로벌 1위 RWA 허브 비전 선포</a></li>
+        <li><a style="color:var(--primary);" href="https://news.nate.com/view/20260521n26468">네이트뉴스 · WM 성장, IB·트레이딩 둔화</a></li>
+        <li><a style="color:var(--primary);" href="https://comp.fnguide.com/SVO2/ASP/SVD_main_chosunbiz.asp?pGB=1&gicode=A003530&NewMenuID=11&cID=CB&MenuYn=Y">FnGuide Company Guide · 한화투자증권 Snapshot</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    DISCLAIMER · 본 자료는 공개된 정보를 바탕으로 골드만삭스 스타일 기관 리서치 노트 형식을 모사하여 작성된 분석 예시이며, 실제 투자 권유나 매매 추천을 위한 자료가 아닙니다. 모든 투자 결정은 본인 책임 하에 이루어져야 합니다.
+  </footer>
+
+</main>
+</body>
+</html>
