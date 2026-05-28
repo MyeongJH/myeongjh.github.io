@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XOVR Financial Model — ERShares Private-Public Crossover ETF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#0b0e11;
+  --surface:#1e2329;
+  --elevated:#2b3139;
+  --hairline:#2b3139;
+  --primary:#FCD535;
+  --primary-active:#f0b90b;
+  --on-primary:#181a20;
+  --body:#eaecef;
+  --muted:#707a8a;
+  --muted-strong:#929aa5;
+  --up:#0ecb81;
+  --down:#f6465d;
+  --info:#3b82f6;
+  --font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-num:'JetBrains Mono','IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--canvas);color:var(--body);font-family:var(--font-sans);font-size:14px;line-height:1.5;}
+body{padding:32px 24px 80px;max-width:1440px;margin:0 auto;}
+header.hero{padding:24px 0 32px;border-bottom:1px solid var(--hairline);margin-bottom:32px;}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.brand-mark{font-size:18px;font-weight:700;color:var(--primary);letter-spacing:-0.3px;}
+.brand-divider{color:var(--muted);}
+.brand-sub{font-size:14px;color:var(--muted);font-weight:500;}
+h1.title{font-size:32px;font-weight:600;letter-spacing:-0.3px;line-height:1.2;margin-bottom:8px;color:#fff;}
+.subtitle{font-size:14px;color:var(--muted);margin-bottom:16px;}
+.meta-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.meta-item{display:flex;flex-direction:column;gap:4px;}
+.meta-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:500;}
+.meta-value{font-family:var(--font-num);font-size:16px;font-weight:500;color:var(--body);}
+.meta-value.yellow{color:var(--primary);}
+.meta-value.up{color:var(--up);}
+
+/* KPI strip */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+.kpi-card{background:var(--surface);border-radius:12px;padding:20px 24px;border:1px solid var(--hairline);}
+.kpi-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;}
+.kpi-value{font-family:var(--font-num);font-size:28px;font-weight:700;color:var(--primary);line-height:1.1;letter-spacing:-0.3px;}
+.kpi-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+.kpi-sub.up{color:var(--up);}
+.kpi-sub.down{color:var(--down);}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:6px;margin-bottom:24px;border:1px solid var(--hairline);overflow-x:auto;}
+.tab{flex:1;min-width:140px;padding:12px 16px;font-size:13px;font-weight:600;color:var(--muted);background:transparent;border:none;cursor:pointer;border-radius:8px;transition:background 0.15s,color 0.15s;font-family:var(--font-sans);text-align:center;white-space:nowrap;}
+.tab:hover{color:var(--body);}
+.tab.active{background:var(--primary);color:var(--on-primary);}
+.tab .tab-num{font-family:var(--font-num);font-size:11px;opacity:0.8;margin-right:6px;}
+
+.panel{display:none;}
+.panel.active{display:block;}
+
+.section-head{margin-bottom:16px;}
+.section-title{font-size:20px;font-weight:600;color:#fff;margin-bottom:6px;letter-spacing:-0.2px;}
+.section-desc{font-size:13px;color:var(--muted);max-width:900px;line-height:1.6;}
+
+/* Table */
+.card{background:var(--surface);border-radius:12px;border:1px solid var(--hairline);overflow:hidden;margin-bottom:24px;}
+.card-head{padding:20px 24px 16px;border-bottom:1px solid var(--hairline);}
+.card-title{font-size:16px;font-weight:600;color:var(--body);margin-bottom:4px;}
+.card-sub{font-size:12px;color:var(--muted);}
+.tbl-wrap{overflow-x:auto;}
+table.fin{width:100%;border-collapse:collapse;font-size:13px;}
+table.fin th,table.fin td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--hairline);}
+table.fin thead th{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;background:var(--surface);position:sticky;top:0;}
+table.fin tbody td{font-family:var(--font-num);color:var(--body);}
+table.fin tbody td.label{text-align:left;font-family:var(--font-sans);color:var(--body);font-weight:500;}
+table.fin tbody td.label.sub{padding-left:28px;color:var(--muted-strong);font-weight:400;}
+table.fin tbody tr.total td{background:rgba(252,213,53,0.04);font-weight:600;color:#fff;border-top:1px solid var(--hairline);border-bottom:2px solid var(--hairline);}
+table.fin tbody tr.subtotal td{background:rgba(255,255,255,0.02);font-weight:600;}
+table.fin tbody td.up{color:var(--up);}
+table.fin tbody td.down{color:var(--down);}
+table.fin tbody td.muted{color:var(--muted);}
+table.fin tbody td.yellow{color:var(--primary);}
+table.fin th.year{color:var(--primary);}
+table.fin th.proj{color:var(--muted-strong);}
+table.fin .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;font-family:var(--font-sans);margin-left:8px;}
+.badge.actual{background:rgba(14,203,129,0.15);color:var(--up);}
+.badge.proj{background:rgba(112,122,138,0.2);color:var(--muted-strong);}
+.badge.scenario-bull{background:rgba(14,203,129,0.15);color:var(--up);}
+.badge.scenario-base{background:rgba(252,213,53,0.15);color:var(--primary);}
+.badge.scenario-bear{background:rgba(246,70,93,0.15);color:var(--down);}
+
+/* Two-col split */
+.split-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.split-2{grid-template-columns:1fr;}.kpi-strip{grid-template-columns:repeat(2,1fr);}}
+
+/* Note box */
+.note{background:rgba(59,130,246,0.08);border-left:3px solid var(--info);padding:14px 18px;border-radius:8px;margin-bottom:20px;font-size:13px;color:var(--body);line-height:1.6;}
+.note.warn{background:rgba(246,70,93,0.08);border-left-color:var(--down);}
+.note.success{background:rgba(14,203,129,0.08);border-left-color:var(--up);}
+.note .nh{font-weight:600;color:#fff;margin-right:8px;}
+
+/* Bar chart inline */
+.bar-row{display:grid;grid-template-columns:100px 1fr 80px;align-items:center;gap:12px;padding:8px 0;}
+.bar-label{font-size:12px;color:var(--muted);}
+.bar-track{height:8px;background:var(--elevated);border-radius:4px;overflow:hidden;}
+.bar-fill{height:100%;background:var(--primary);border-radius:4px;}
+.bar-fill.up{background:var(--up);}
+.bar-fill.down{background:var(--down);}
+.bar-val{font-family:var(--font-num);font-size:12px;color:var(--body);text-align:right;}
+
+/* Scenario cards */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.scenario-grid{grid-template-columns:1fr;}}
+.scen-card{background:var(--surface);border-radius:12px;padding:20px 24px;border:1px solid var(--hairline);position:relative;}
+.scen-card.bull{border-top:2px solid var(--up);}
+.scen-card.base{border-top:2px solid var(--primary);}
+.scen-card.bear{border-top:2px solid var(--down);}
+.scen-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.scen-name.bull{color:var(--up);}
+.scen-name.base{color:var(--primary);}
+.scen-name.bear{color:var(--down);}
+.scen-headline{font-family:var(--font-num);font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.scen-sub{font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:14px;}
+.scen-list{font-size:12px;color:var(--body);line-height:1.7;}
+.scen-list li{list-style:none;padding-left:14px;position:relative;margin-bottom:4px;}
+.scen-list li::before{content:"·";position:absolute;left:4px;color:var(--muted);}
+
+/* Inputs / assumption pills */
+.assump-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+@media(max-width:900px){.assump-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.assump-grid{grid-template-columns:1fr;}}
+.assump-pill{background:var(--elevated);border-radius:8px;padding:12px 16px;border:1px solid var(--hairline);}
+.assump-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;}
+.assump-val{font-family:var(--font-num);font-size:18px;font-weight:600;color:var(--primary);}
+.assump-sub{font-size:11px;color:var(--muted-strong);margin-top:2px;}
+
+footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--hairline);font-size:12px;color:var(--muted);line-height:1.7;}
+footer a{color:var(--primary);text-decoration:none;}
+footer a:hover{color:var(--primary-active);}
+
+.disclaimer{background:var(--surface);border-radius:8px;padding:14px 18px;margin-top:16px;font-size:11px;color:var(--muted);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="brand">
+    <span class="brand-mark">ERShares</span>
+    <span class="brand-divider">·</span>
+    <span class="brand-sub">Financial Model · Task 2</span>
+  </div>
+  <h1 class="title">XOVR Financial Model</h1>
+  <p class="subtitle">ERShares Private-Public Crossover ETF · AUM · 운용보수 · NAV 구성 · SpaceX SPV 시나리오 · 투자자 IRR · 2026–2030E</p>
+  <div class="meta-row">
+    <div class="meta-item"><span class="meta-label">Ticker</span><span class="meta-value yellow">XOVR</span></div>
+    <div class="meta-item"><span class="meta-label">As of</span><span class="meta-value">2026-05-28</span></div>
+    <div class="meta-item"><span class="meta-label">AUM</span><span class="meta-value">$1.17 B</span></div>
+    <div class="meta-item"><span class="meta-label">SpaceX 비중</span><span class="meta-value up">23.0%</span></div>
+    <div class="meta-item"><span class="meta-label">Implied SpaceX Val.</span><span class="meta-value yellow">$1.55 T</span></div>
+    <div class="meta-item"><span class="meta-label">Expense Ratio</span><span class="meta-value">0.75%</span></div>
+  </div>
+</header>
+
+<!-- KPI strip -->
+<section class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-label">AUM (2026E)</div>
+    <div class="kpi-value">$1,500M</div>
+    <div class="kpi-sub up">▲ +28% YoY (Base)</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Mgmt Fee 수익 (2026E)</div>
+    <div class="kpi-value">$10.1M</div>
+    <div class="kpi-sub">@ 0.75% net</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">SpaceX SPV NAV</div>
+    <div class="kpi-value">$291.6M</div>
+    <div class="kpi-sub">2026-05-21 mark</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">5Y NAV CAGR (Base)</div>
+    <div class="kpi-value">14.8%</div>
+    <div class="kpi-sub">2025A → 2030E</div>
+  </div>
+</section>
+
+<!-- Tabs -->
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="rev" role="tab"><span class="tab-num">01</span>수익 모델</button>
+  <button class="tab" data-tab="pl" role="tab"><span class="tab-num">02</span>손익 (P&L)</button>
+  <button class="tab" data-tab="cf" role="tab"><span class="tab-num">03</span>현금흐름</button>
+  <button class="tab" data-tab="nav" role="tab"><span class="tab-num">04</span>NAV 구성</button>
+  <button class="tab" data-tab="scen" role="tab"><span class="tab-num">05</span>시나리오</button>
+  <button class="tab" data-tab="dcf" role="tab"><span class="tab-num">06</span>DCF/IRR Inputs</button>
+</div>
+
+<!-- ===================== TAB 1: REVENUE MODEL ===================== -->
+<section class="panel active" id="panel-rev">
+  <div class="section-head">
+    <h2 class="section-title">01 · 수익 모델 (Revenue Model)</h2>
+    <p class="section-desc">ETF는 사업회사와 달리 매출 = (평균 AUM × 순보수율) 한 줄로 단순화된다. 본 탭은 (1) AUM 추이 — 자금 순유입(NetFlows) + 시장 평가가치 변동(Mkt Δ)으로 분해, (2) 순보수율 시계열, (3) 보유 사이드별 NAV 구성(공모 vs SPV) 세 표로 구성한다.</p>
+  </div>
+
+  <div class="note">
+    <span class="nh">방법론</span>AUM(t) = AUM(t-1) + NetFlows(t) + Mkt Δ(t). Mgmt Fee 수익 = (AUM(t-1) + AUM(t))/2 × NetExpenseRatio. ER30TR Index 라이선스 수익은 별도 라인.
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">AUM 추이 및 분해 ($M, 연말 기준)</div>
+      <div class="card-sub">2023A–2025A 실적 / 2026E–2030E Base 시나리오 (NetFlows + Mkt Δ)</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2023A</th>
+            <th class="year">2024A</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">기초 AUM</td><td>50</td><td>80</td><td>200</td><td>1,170</td><td>1,500</td><td>2,500</td><td>3,500</td><td>4,000</td></tr>
+          <tr><td class="label sub">+ 순자금유입 (NetFlows)</td><td class="up">+15</td><td class="up">+45</td><td class="up">+450</td><td class="up">+200</td><td class="up">+700</td><td class="up">+700</td><td class="up">+300</td><td class="up">+300</td></tr>
+          <tr><td class="label sub">+ 시장 평가 변동 (Mkt Δ)</td><td class="up">+15</td><td class="up">+75</td><td class="up">+520</td><td class="up">+130</td><td class="up">+300</td><td class="up">+300</td><td class="up">+200</td><td class="up">+200</td></tr>
+          <tr class="total"><td class="label">기말 AUM</td><td class="yellow">80</td><td class="yellow">200</td><td class="yellow">1,170</td><td class="yellow">1,500</td><td class="yellow">2,500</td><td class="yellow">3,500</td><td class="yellow">4,000</td><td class="yellow">4,500</td></tr>
+          <tr><td class="label muted">YoY 성장률</td><td class="muted">+60%</td><td class="muted">+150%</td><td class="muted">+485%</td><td class="muted">+28%</td><td class="muted">+67%</td><td class="muted">+40%</td><td class="muted">+14%</td><td class="muted">+13%</td></tr>
+          <tr><td class="label muted">평균 AUM (mid-period)</td><td class="muted">65</td><td class="muted">140</td><td class="muted">685</td><td class="muted">1,335</td><td class="muted">2,000</td><td class="muted">3,000</td><td class="muted">3,750</td><td class="muted">4,250</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">운용보수 수익 분해 ($M)</div>
+      <div class="card-sub">XOVR Mgmt Fee (0.75% net) + ENTIX 보수 + ER30TR Index 라이선스</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2023A</th>
+            <th class="year">2024A</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">XOVR 순보수율</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td><td class="muted">0.75%</td></tr>
+          <tr><td class="label">XOVR Mgmt Fee 수익</td><td>0.5</td><td>1.1</td><td>5.1</td><td>10.1</td><td>15.0</td><td>22.5</td><td>28.1</td><td>31.9</td></tr>
+          <tr><td class="label">ENTIX 보수 (글로벌 MF)</td><td>0.3</td><td>0.4</td><td>0.5</td><td>0.6</td><td>0.7</td><td>0.8</td><td>0.9</td><td>1.0</td></tr>
+          <tr><td class="label">ER30TR Index 라이선스</td><td>0.1</td><td>0.2</td><td>0.4</td><td>0.6</td><td>0.8</td><td>1.0</td><td>1.2</td><td>1.4</td></tr>
+          <tr class="subtotal"><td class="label">소계: 수수료 수익</td><td>0.9</td><td>1.7</td><td>6.0</td><td>11.3</td><td>16.5</td><td>24.3</td><td>30.2</td><td>34.3</td></tr>
+          <tr><td class="label">SPV 관련 부수 수익*</td><td class="muted">0.0</td><td class="muted">0.0</td><td>0.2</td><td>0.5</td><td>0.8</td><td>1.0</td><td>1.0</td><td>1.0</td></tr>
+          <tr class="total"><td class="label">총 운용 수익 (Top-line)</td><td class="yellow">0.9</td><td class="yellow">1.7</td><td class="yellow">6.2</td><td class="yellow">11.8</td><td class="yellow">17.3</td><td class="yellow">25.3</td><td class="yellow">31.2</td><td class="yellow">35.3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="margin:16px 24px 20px;">
+      <span class="nh">*</span>SPV 관련 부수 수익은 secondary 거래 스프레드 일부, ETF distribution 수익 등이며 운용사 입장의 추정치. 실제 SPV는 0/0 구조로 운용보수가 가산되지 않는다고 ERShares는 공시.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">상품 라인 별 NAV 구성 (2026-05-21 기준, $M)</div>
+      <div class="card-sub">XOVR 단일 펀드 내 보유 자산 구성 — 공모 vs 비상장 SPV</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">보유 카테고리</th>
+            <th>티커/SPV</th>
+            <th>NAV ($M)</th>
+            <th>비중</th>
+            <th>분류</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">SpaceX SPV</td><td class="muted">SPV-SpaceX, LLC</td><td>291.6</td><td class="yellow">23.0%</td><td class="muted">Private SPV</td></tr>
+          <tr><td class="label">NVIDIA</td><td class="muted">NVDA</td><td>132.6</td><td>10.5%</td><td class="muted">Public</td></tr>
+          <tr><td class="label">Alphabet</td><td class="muted">GOOGL</td><td>90.9</td><td>7.2%</td><td class="muted">Public</td></tr>
+          <tr><td class="label">Astera Labs</td><td class="muted">ALAB</td><td>64.0</td><td>5.1%</td><td class="muted">Public</td></tr>
+          <tr><td class="label">Meta Platforms</td><td class="muted">META</td><td>62.9</td><td>5.0%</td><td class="muted">Public</td></tr>
+          <tr><td class="label">기타 ER30TR 공모주 (26종)</td><td class="muted">26 holdings</td><td>458.0</td><td>36.2%</td><td class="muted">Public</td></tr>
+          <tr><td class="label">Klarna SPV</td><td class="muted">SPV-Klarna</td><td>40.0</td><td>3.2%</td><td class="muted">Private SPV</td></tr>
+          <tr><td class="label">Anduril SPV</td><td class="muted">SPV-Anduril</td><td>25.0</td><td>2.0%</td><td class="muted">Private SPV</td></tr>
+          <tr><td class="label">현금 및 단기상품</td><td class="muted">Cash</td><td>100.0</td><td>7.8%</td><td class="muted">Cash</td></tr>
+          <tr class="total"><td class="label">합계</td><td class="muted">—</td><td class="yellow">1,265.0</td><td class="yellow">100.0%</td><td class="muted">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 2: P&L ===================== -->
+<section class="panel" id="panel-pl">
+  <div class="section-head">
+    <h2 class="section-title">02 · 손익 (Income Statement, 운용사 단위)</h2>
+    <p class="section-desc">XOVR는 ETF이므로 펀드 자체에는 통상의 “회사 손익”이 존재하지 않는다(NAV에 비용이 차감될 뿐). 본 탭은 “EntrepreneurShares LLC”(운용사) 입장의 추정 손익 — 펀드 수수료 수익 vs 운용·컴플라이언스·배포 비용 — 을 모델링한다. 모든 비용은 추정.</p>
+  </div>
+
+  <div class="note warn">
+    <span class="nh">주의</span>ERShares는 비상장 운용사로 손익 공시 의무가 제한적. 본 표는 동급 부티크 ETF 운용사 비용 구조(AUM의 0.30~0.45%)를 가정한 추정 모델이며, 실제 회사 재무와 다를 수 있다.
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">EntrepreneurShares LLC — 추정 손익 ($M)</div>
+      <div class="card-sub">매출 ↔ 운용·관리 비용 ↔ 영업이익</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2023A</th>
+            <th class="year">2024A</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">XOVR Mgmt Fee 수익</td><td>0.5</td><td>1.1</td><td>5.1</td><td>10.1</td><td>15.0</td><td>22.5</td><td>28.1</td><td>31.9</td></tr>
+          <tr><td class="label">ENTIX 보수 + ER30TR 라이선스 + 기타</td><td>0.4</td><td>0.6</td><td>1.1</td><td>1.7</td><td>2.3</td><td>2.8</td><td>3.1</td><td>3.4</td></tr>
+          <tr class="subtotal"><td class="label">매출 (Revenue)</td><td>0.9</td><td>1.7</td><td>6.2</td><td>11.8</td><td>17.3</td><td>25.3</td><td>31.2</td><td>35.3</td></tr>
+          <tr><td class="label sub">− 인건비 (Comp & Benefits)</td><td class="down">(1.2)</td><td class="down">(1.5)</td><td class="down">(2.5)</td><td class="down">(3.8)</td><td class="down">(5.0)</td><td class="down">(6.5)</td><td class="down">(7.5)</td><td class="down">(8.3)</td></tr>
+          <tr><td class="label sub">− 외부 운용·보관·청산</td><td class="down">(0.3)</td><td class="down">(0.4)</td><td class="down">(0.8)</td><td class="down">(1.3)</td><td class="down">(1.9)</td><td class="down">(2.7)</td><td class="down">(3.2)</td><td class="down">(3.5)</td></tr>
+          <tr><td class="label sub">− SPV 카운터파티 비용</td><td class="down">(0.0)</td><td class="down">(0.1)</td><td class="down">(0.3)</td><td class="down">(0.6)</td><td class="down">(0.9)</td><td class="down">(1.2)</td><td class="down">(1.4)</td><td class="down">(1.5)</td></tr>
+          <tr><td class="label sub">− 컴플라이언스/법무</td><td class="down">(0.4)</td><td class="down">(0.5)</td><td class="down">(0.7)</td><td class="down">(0.9)</td><td class="down">(1.1)</td><td class="down">(1.3)</td><td class="down">(1.4)</td><td class="down">(1.5)</td></tr>
+          <tr><td class="label sub">− 마케팅/배포</td><td class="down">(0.2)</td><td class="down">(0.3)</td><td class="down">(0.5)</td><td class="down">(0.7)</td><td class="down">(1.0)</td><td class="down">(1.3)</td><td class="down">(1.4)</td><td class="down">(1.5)</td></tr>
+          <tr><td class="label sub">− 기술/데이터/사무</td><td class="down">(0.2)</td><td class="down">(0.3)</td><td class="down">(0.5)</td><td class="down">(0.7)</td><td class="down">(1.0)</td><td class="down">(1.3)</td><td class="down">(1.4)</td><td class="down">(1.5)</td></tr>
+          <tr class="subtotal"><td class="label">총 운영비용</td><td class="down">(2.3)</td><td class="down">(3.1)</td><td class="down">(5.3)</td><td class="down">(8.0)</td><td class="down">(10.9)</td><td class="down">(14.3)</td><td class="down">(16.3)</td><td class="down">(17.8)</td></tr>
+          <tr class="total"><td class="label">EBIT (영업이익)</td><td class="down">(1.4)</td><td class="down">(1.4)</td><td class="up">0.9</td><td class="up">3.8</td><td class="up">6.4</td><td class="up">11.0</td><td class="up">14.9</td><td class="up">17.5</td></tr>
+          <tr><td class="label muted">EBIT 마진</td><td class="muted">n/m</td><td class="muted">n/m</td><td class="muted">14.5%</td><td class="muted">32.2%</td><td class="muted">37.0%</td><td class="muted">43.5%</td><td class="muted">47.8%</td><td class="muted">49.6%</td></tr>
+          <tr><td class="label sub">− 이자/기타</td><td class="muted">(0.0)</td><td class="muted">(0.0)</td><td class="muted">(0.0)</td><td class="muted">(0.1)</td><td class="muted">(0.1)</td><td class="muted">(0.1)</td><td class="muted">(0.1)</td><td class="muted">(0.1)</td></tr>
+          <tr><td class="label sub">− 법인세 (25%)</td><td class="muted">0.0</td><td class="muted">0.0</td><td class="muted">(0.2)</td><td class="muted">(0.9)</td><td class="muted">(1.6)</td><td class="muted">(2.7)</td><td class="muted">(3.7)</td><td class="muted">(4.4)</td></tr>
+          <tr class="total"><td class="label">순이익 (NI)</td><td class="down">(1.4)</td><td class="down">(1.4)</td><td class="up">0.7</td><td class="up">2.8</td><td class="up">4.7</td><td class="up">8.2</td><td class="up">11.1</td><td class="up">13.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">매출 → EBIT Margin Bridge (2025A → 2030E)</div>
+      <div class="card-sub">AUM 규모 확장에 따른 운영 레버리지</div>
+    </div>
+    <div style="padding:8px 24px 24px;">
+      <div class="bar-row"><div class="bar-label">2025A</div><div class="bar-track"><div class="bar-fill up" style="width:14.5%"></div></div><div class="bar-val">14.5%</div></div>
+      <div class="bar-row"><div class="bar-label">2026E</div><div class="bar-track"><div class="bar-fill up" style="width:32.2%"></div></div><div class="bar-val">32.2%</div></div>
+      <div class="bar-row"><div class="bar-label">2027E</div><div class="bar-track"><div class="bar-fill up" style="width:37.0%"></div></div><div class="bar-val">37.0%</div></div>
+      <div class="bar-row"><div class="bar-label">2028E</div><div class="bar-track"><div class="bar-fill up" style="width:43.5%"></div></div><div class="bar-val">43.5%</div></div>
+      <div class="bar-row"><div class="bar-label">2029E</div><div class="bar-track"><div class="bar-fill up" style="width:47.8%"></div></div><div class="bar-val">47.8%</div></div>
+      <div class="bar-row"><div class="bar-label">2030E</div><div class="bar-track"><div class="bar-fill" style="width:49.6%"></div></div><div class="bar-val">49.6%</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 3: CASH FLOW ===================== -->
+<section class="panel" id="panel-cf">
+  <div class="section-head">
+    <h2 class="section-title">03 · 현금흐름 (Cash Flow, 펀드 단위)</h2>
+    <p class="section-desc">XOVR 펀드 단의 현금흐름은 (i) 운영(보수 차감), (ii) 투자(공모주·SPV 매매), (iii) 자금조달(주식 발행·환매)로 나뉜다. ETF의 본질상 “창설/환매”가 핵심이며, 비상장 SPV는 신규 자금 유입 → SPV 추가 매수로 연결된다.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">XOVR Fund-Level Cash Flow ($M)</div>
+      <div class="card-sub">단순화 모델: 펀드의 현금 박스 관점</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2023A</th>
+            <th class="year">2024A</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="subtotal"><td class="label">영업활동 (Operating)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="label sub">+ 이자/배당 수령</td><td>1.0</td><td>2.5</td><td>10.5</td><td>17.0</td><td>26.0</td><td>36.0</td><td>40.0</td><td>44.0</td></tr>
+          <tr><td class="label sub">− 운용보수 차감</td><td class="down">(0.5)</td><td class="down">(1.1)</td><td class="down">(5.1)</td><td class="down">(10.1)</td><td class="down">(15.0)</td><td class="down">(22.5)</td><td class="down">(28.1)</td><td class="down">(31.9)</td></tr>
+          <tr><td class="label sub">− 외부 보관·관리비</td><td class="down">(0.3)</td><td class="down">(0.5)</td><td class="down">(1.2)</td><td class="down">(2.0)</td><td class="down">(3.0)</td><td class="down">(4.0)</td><td class="down">(4.5)</td><td class="down">(5.0)</td></tr>
+          <tr class="subtotal"><td class="label">소계 영업현금흐름</td><td>0.2</td><td>0.9</td><td>4.2</td><td>4.9</td><td>8.0</td><td>9.5</td><td>7.4</td><td>7.1</td></tr>
+
+          <tr class="subtotal"><td class="label">투자활동 (Investing)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="label sub">− 공모주 순매수</td><td class="down">(10)</td><td class="down">(80)</td><td class="down">(350)</td><td class="down">(120)</td><td class="down">(420)</td><td class="down">(440)</td><td class="down">(200)</td><td class="down">(200)</td></tr>
+          <tr><td class="label sub">− SPV 순매수 (SpaceX 외)</td><td class="muted">0</td><td class="down">(20)</td><td class="down">(220)</td><td class="down">(80)</td><td class="down">(280)</td><td class="down">(260)</td><td class="down">(100)</td><td class="down">(100)</td></tr>
+          <tr><td class="label sub">+ SPV 분배/매각 회수</td><td class="muted">0</td><td class="muted">0</td><td class="muted">0</td><td class="up">+5</td><td class="up">+50</td><td class="up">+80</td><td class="up">+100</td><td class="up">+150</td></tr>
+          <tr class="subtotal"><td class="label">소계 투자현금흐름</td><td class="down">(10)</td><td class="down">(100)</td><td class="down">(570)</td><td class="down">(195)</td><td class="down">(650)</td><td class="down">(620)</td><td class="down">(200)</td><td class="down">(150)</td></tr>
+
+          <tr class="subtotal"><td class="label">자금조달 (Financing)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="label sub">+ Creation (신주 발행)</td><td class="up">+20</td><td class="up">+125</td><td class="up">+650</td><td class="up">+250</td><td class="up">+800</td><td class="up">+800</td><td class="up">+400</td><td class="up">+400</td></tr>
+          <tr><td class="label sub">− Redemption (환매)</td><td class="down">(5)</td><td class="down">(20)</td><td class="down">(80)</td><td class="down">(50)</td><td class="down">(100)</td><td class="down">(100)</td><td class="down">(100)</td><td class="down">(100)</td></tr>
+          <tr class="subtotal"><td class="label">소계 자금조달현금흐름</td><td class="up">+15</td><td class="up">+105</td><td class="up">+570</td><td class="up">+200</td><td class="up">+700</td><td class="up">+700</td><td class="up">+300</td><td class="up">+300</td></tr>
+
+          <tr class="total"><td class="label">순 현금 변동</td><td class="yellow">5.2</td><td class="yellow">5.9</td><td class="yellow">4.2</td><td class="yellow">9.9</td><td class="yellow">58.0</td><td class="yellow">89.5</td><td class="yellow">107.4</td><td class="yellow">157.1</td></tr>
+          <tr><td class="label muted">기말 현금 + 단기상품</td><td class="muted">5</td><td class="muted">11</td><td class="muted">15</td><td class="muted">25</td><td class="muted">83</td><td class="muted">172</td><td class="muted">280</td><td class="muted">437</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="nh">관찰</span>2026E–2028E에는 SpaceX IPO 후속 분배·매각 회수가 펀드의 ‘투자활동 현금 유입’ 라인을 처음으로 만들어내는 변곡점이다. 이 시기 펀드의 현금 보유 비중이 자연 증가하며, 운용사의 재투자 의사결정(추가 SPV 진입 vs 환매 대응)이 NAV·총수익률의 핵심 변수가 된다.
+  </div>
+</section>
+
+<!-- ===================== TAB 4: NAV (Balance Sheet) ===================== -->
+<section class="panel" id="panel-nav">
+  <div class="section-head">
+    <h2 class="section-title">04 · NAV 구성 (Balance Sheet 대체)</h2>
+    <p class="section-desc">ETF에는 통상의 BS가 없지만, 동등 개념으로 “자산 = NAV 구성”을 본다. 공모 사이드 + SPV 사이드 + 현금으로 분해하고 각 사이드의 fair value 계층(Level 1/2/3)을 명시한다. XOVR의 본질적 평가 리스크는 Level 3(주로 SpaceX SPV)에 집중되어 있다.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">NAV 구성 시계열 ($M, 연말 기준 Base)</div>
+      <div class="card-sub">공모 사이드 (Level 1) vs 비상장 SPV (Level 3) vs 현금 (Level 1)</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2023A</th>
+            <th class="year">2024A</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="subtotal"><td class="label">공모주 사이드 (Public, Level 1)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="label sub">ER30TR Index 30종목</td><td>70</td><td>160</td><td>820</td><td>1,000</td><td>1,700</td><td>2,400</td><td>2,750</td><td>3,100</td></tr>
+          <tr><td class="label sub">기타 액티브 보유</td><td>5</td><td>15</td><td>40</td><td>50</td><td>80</td><td>120</td><td>140</td><td>160</td></tr>
+          <tr class="subtotal"><td class="label">소계 공모</td><td>75</td><td>175</td><td>860</td><td>1,050</td><td>1,780</td><td>2,520</td><td>2,890</td><td>3,260</td></tr>
+
+          <tr class="subtotal"><td class="label">비상장 SPV (Private, Level 3)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td class="label sub">SpaceX SPV</td><td class="muted">0</td><td>20</td><td>250</td><td>340</td><td>500</td><td>700</td><td>700</td><td>700</td></tr>
+          <tr><td class="label sub">Klarna SPV</td><td class="muted">0</td><td class="muted">0</td><td>30</td><td>50</td><td>60</td><td>70</td><td>70</td><td>70</td></tr>
+          <tr><td class="label sub">Anduril SPV</td><td class="muted">0</td><td class="muted">0</td><td>15</td><td>30</td><td>50</td><td>70</td><td>80</td><td>80</td></tr>
+          <tr><td class="label sub">신규 SPV (Stripe, Anthropic 등)</td><td class="muted">0</td><td class="muted">0</td><td class="muted">0</td><td>5</td><td>50</td><td>100</td><td>150</td><td>200</td></tr>
+          <tr class="subtotal"><td class="label">소계 비상장 SPV</td><td class="yellow">0</td><td class="yellow">20</td><td class="yellow">295</td><td class="yellow">425</td><td class="yellow">660</td><td class="yellow">940</td><td class="yellow">1,000</td><td class="yellow">1,050</td></tr>
+          <tr><td class="label muted">SPV 비중 (NAV)</td><td class="muted">0.0%</td><td class="muted">10.0%</td><td class="muted">25.2%</td><td class="muted">28.3%</td><td class="muted">26.4%</td><td class="muted">26.9%</td><td class="muted">25.0%</td><td class="muted">23.3%</td></tr>
+
+          <tr class="subtotal"><td class="label">현금 + 단기상품 (Level 1)</td><td>5</td><td>5</td><td>15</td><td>25</td><td>60</td><td>40</td><td>110</td><td>190</td></tr>
+
+          <tr class="total"><td class="label">기말 총 NAV</td><td class="yellow">80</td><td class="yellow">200</td><td class="yellow">1,170</td><td class="yellow">1,500</td><td class="yellow">2,500</td><td class="yellow">3,500</td><td class="yellow">4,000</td><td class="yellow">4,500</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="split-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">SpaceX SPV 마크 추적</div>
+        <div class="card-sub">진입가 → 첫 마크업 → 동결 → 정상화</div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="fin">
+          <thead>
+            <tr>
+              <th style="text-align:left">시점</th>
+              <th>주당가</th>
+              <th>Carrying ($M)</th>
+              <th>Implied Val.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">2024-12-03 진입</td><td>$135</td><td>20</td><td class="muted">~$250B</td></tr>
+            <tr><td class="label">2024-12-10 마크업</td><td class="up">$185</td><td>27</td><td class="muted">~$350B</td></tr>
+            <tr><td class="label">2025년 전체 (동결)</td><td class="muted">$185</td><td class="muted">160</td><td class="muted">~$350B</td></tr>
+            <tr><td class="label">2025-12 정상화</td><td class="up">~$420</td><td>250</td><td class="muted">~$800B</td></tr>
+            <tr><td class="label">2026-05-21 재평가</td><td class="up">~$815</td><td class="yellow">291.6</td><td class="yellow">$1.55T</td></tr>
+            <tr><td class="label">2026-06E IPO 가정</td><td class="muted">~$920</td><td class="muted">340</td><td class="muted">$1.75T</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Fair Value 계층 (Level 1/2/3) 분포</div>
+        <div class="card-sub">2026-05-21 기준 NAV 분해</div>
+      </div>
+      <div style="padding:8px 24px 24px;">
+        <div class="bar-row"><div class="bar-label">Level 1 (공모)</div><div class="bar-track"><div class="bar-fill up" style="width:69.7%"></div></div><div class="bar-val">69.7%</div></div>
+        <div class="bar-row"><div class="bar-label">Level 1 (현금)</div><div class="bar-track"><div class="bar-fill" style="width:7.8%;background:var(--muted-strong)"></div></div><div class="bar-val">7.8%</div></div>
+        <div class="bar-row"><div class="bar-label">Level 3 (SPV)</div><div class="bar-track"><div class="bar-fill" style="width:22.5%"></div></div><div class="bar-val">22.5%</div></div>
+        <div class="note warn" style="margin-top:16px;font-size:12px;">
+          <span class="nh">리스크</span>Level 3 자산 22.5%는 운용사 평가위원회의 재량 판단 영역. 1940년법 일리퀴드 자산 15% 한도와의 갭(7.5%p)은 SPV가 “일리퀴드 일반 분류 외 우회”로 처리되기 때문이며, SEC 규제 변경 시 즉시 영향권.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB 5: SCENARIOS ===================== -->
+<section class="panel" id="panel-scen">
+  <div class="section-head">
+    <h2 class="section-title">05 · 시나리오 (Bull / Base / Bear)</h2>
+    <p class="section-desc">XOVR의 NAV·총수익률은 SpaceX IPO 결과와 secondary 시장 멀티플에 좌우된다. 본 탭은 세 시나리오를 정의하고 각각의 SpaceX 평가가치, AUM 트라젝토리, 2030E NAV/share, 5Y 총수익률을 매트릭스로 제시한다.</p>
+  </div>
+
+  <div class="scenario-grid">
+    <div class="scen-card bull">
+      <div class="scen-name bull">Bull · 강세</div>
+      <div class="scen-headline">+38% CAGR</div>
+      <div class="scen-sub">SpaceX IPO 성공 + Starlink 가입자 폭증 + 정부 우주예산 확대</div>
+      <ul class="scen-list">
+        <li>SpaceX IPO 가격 $2.0T · 락업 90일</li>
+        <li>2027E SpaceX 단독 $900M (펀드 30%)</li>
+        <li>2030E AUM $7.5B · NAV/share $135</li>
+        <li>Klarna IPO 성공 + Anduril secondary 가격 폭등</li>
+        <li>리테일 자금 매월 $50M+ 순유입</li>
+      </ul>
+    </div>
+    <div class="scen-card base">
+      <div class="scen-name base">Base · 기본</div>
+      <div class="scen-headline">+14.8% CAGR</div>
+      <div class="scen-sub">SpaceX IPO 현재 implied valuation 부근 · 단계적 분배</div>
+      <ul class="scen-list">
+        <li>SpaceX IPO 가격 $1.5–1.75T · 락업 180일</li>
+        <li>2027E SpaceX $500M (펀드 20%)</li>
+        <li>2030E AUM $4.5B · NAV/share $79</li>
+        <li>Klarna IPO 정상 진행 + Anduril 안정 마크</li>
+        <li>분기 평균 $50–80M 자금 순유입</li>
+      </ul>
+    </div>
+    <div class="scen-card bear">
+      <div class="scen-name bear">Bear · 약세</div>
+      <div class="scen-headline">−2% CAGR</div>
+      <div class="scen-sub">SpaceX IPO 연기/실패 · SEC 규제 강화 · 매스 환매</div>
+      <ul class="scen-list">
+        <li>SpaceX IPO 연기 또는 가격 $1.0T 이하</li>
+        <li>SPV 마크다운 압박 → NAV 단계적 하향</li>
+        <li>2030E AUM $1.8B · NAV/share $44</li>
+        <li>SEC가 ETF 비상장 한도 강화 → 구조 전환</li>
+        <li>리테일 자금 분기 $50M+ 순유출 가능</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">3-시나리오 NAV 트라젝토리 ($M, 연말)</div>
+      <div class="card-sub">Bull / Base / Bear AUM 시계열</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="year">2025A</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+            <th class="proj">5Y CAGR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">Bull <span class="badge scenario-bull">강세</span></td><td>1,170</td><td class="up">2,200</td><td class="up">3,800</td><td class="up">5,500</td><td class="up">6,700</td><td class="up">7,500</td><td class="up">+45%</td></tr>
+          <tr><td class="label">Base <span class="badge scenario-base">기본</span></td><td>1,170</td><td class="yellow">1,500</td><td class="yellow">2,500</td><td class="yellow">3,500</td><td class="yellow">4,000</td><td class="yellow">4,500</td><td class="yellow">+31%</td></tr>
+          <tr><td class="label">Bear <span class="badge scenario-bear">약세</span></td><td>1,170</td><td class="down">1,100</td><td class="down">1,300</td><td class="down">1,500</td><td class="down">1,600</td><td class="down">1,800</td><td class="down">+9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="split-2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">SpaceX SPV NAV 시나리오 ($M)</div>
+        <div class="card-sub">SPV carrying value 시계열</div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="fin">
+          <thead>
+            <tr><th style="text-align:left">($M)</th><th class="year">2025A</th><th class="proj">2026E</th><th class="proj">2027E</th><th class="proj">2030E</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">Bull</td><td>250</td><td class="up">450</td><td class="up">900</td><td class="up">1,400</td></tr>
+            <tr><td class="label">Base</td><td>250</td><td class="yellow">340</td><td class="yellow">500</td><td class="yellow">700</td></tr>
+            <tr><td class="label">Bear</td><td>250</td><td class="down">280</td><td class="down">220</td><td class="down">200</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">NAV/share 시나리오 (USD)</div>
+        <div class="card-sub">2026-05-28 $40 가정 → 2030E</div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="fin">
+          <thead>
+            <tr><th style="text-align:left">$/share</th><th class="year">2026E</th><th class="proj">2027E</th><th class="proj">2028E</th><th class="proj">2030E</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="label">Bull</td><td class="up">52</td><td class="up">75</td><td class="up">102</td><td class="up">135</td></tr>
+            <tr><td class="label">Base</td><td class="yellow">44</td><td class="yellow">55</td><td class="yellow">66</td><td class="yellow">79</td></tr>
+            <tr><td class="label">Bear</td><td class="down">38</td><td class="down">36</td><td class="down">38</td><td class="down">44</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="note success">
+    <span class="nh">사용자 포커스</span>“SpaceX 평가가치” 관점에서 결정적인 시나리오 변수는 (a) IPO 가격, (b) 락업 기간, (c) SPV의 분배 우선순위 — 이 셋이 위 매트릭스의 절반 이상을 좌우. 한 가지라도 Bear 방향이면 펀드 NAV는 즉시 7~15% 하향 압력.
+  </div>
+</section>
+
+<!-- ===================== TAB 6: DCF / IRR INPUTS ===================== -->
+<section class="panel" id="panel-dcf">
+  <div class="section-head">
+    <h2 class="section-title">06 · DCF / IRR Inputs (Task 3 준비)</h2>
+    <p class="section-desc">XOVR는 ETF이므로 일반적 DCF는 적용되지 않는다. 대신 (1) 운용사 EntrepreneurShares LLC의 DCF (수수료 매출 기반), (2) 투자자(ETF 보유자)의 5Y IRR — NAV 가치 변화 + 분배 — 두 축으로 Task 3의 입력을 준비한다.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">운용사(EntrepreneurShares LLC) 가상 DCF Input</div>
+      <div class="card-sub">수수료 매출 → 영업이익 → FCF</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">($M)</th>
+            <th class="proj">2026E</th>
+            <th class="proj">2027E</th>
+            <th class="proj">2028E</th>
+            <th class="proj">2029E</th>
+            <th class="proj">2030E</th>
+            <th class="proj">Terminal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">매출 (Top-line)</td><td>11.8</td><td>17.3</td><td>25.3</td><td>31.2</td><td>35.3</td><td class="muted">+5% perp.</td></tr>
+          <tr><td class="label">EBIT</td><td>3.8</td><td>6.4</td><td>11.0</td><td>14.9</td><td>17.5</td><td class="muted">17.5</td></tr>
+          <tr><td class="label">− 세금 (25%)</td><td class="down">(0.9)</td><td class="down">(1.6)</td><td class="down">(2.7)</td><td class="down">(3.7)</td><td class="down">(4.4)</td><td class="muted">—</td></tr>
+          <tr><td class="label">NOPAT</td><td>2.9</td><td>4.8</td><td>8.2</td><td>11.2</td><td>13.1</td><td class="muted">—</td></tr>
+          <tr><td class="label sub">+ D&A</td><td>0.2</td><td>0.3</td><td>0.4</td><td>0.5</td><td>0.5</td><td class="muted">—</td></tr>
+          <tr><td class="label sub">− Capex</td><td class="down">(0.3)</td><td class="down">(0.4)</td><td class="down">(0.5)</td><td class="down">(0.5)</td><td class="down">(0.5)</td><td class="muted">—</td></tr>
+          <tr><td class="label sub">− WC 변동</td><td class="down">(0.1)</td><td class="down">(0.2)</td><td class="down">(0.3)</td><td class="down">(0.3)</td><td class="down">(0.3)</td><td class="muted">—</td></tr>
+          <tr class="total"><td class="label">Unlevered FCF</td><td class="yellow">2.7</td><td class="yellow">4.5</td><td class="yellow">7.8</td><td class="yellow">10.9</td><td class="yellow">12.8</td><td class="yellow">13.4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="assump-grid">
+    <div class="assump-pill"><div class="assump-label">WACC</div><div class="assump-val">12.0%</div><div class="assump-sub">자산운용사 부티크 적용</div></div>
+    <div class="assump-pill"><div class="assump-label">Terminal Growth</div><div class="assump-val">5.0%</div><div class="assump-sub">AUM 기반 영구성장</div></div>
+    <div class="assump-pill"><div class="assump-label">Terminal EV/AUM</div><div class="assump-val">2.5%</div><div class="assump-sub">자산운용 비교 평균</div></div>
+    <div class="assump-pill"><div class="assump-label">세율</div><div class="assump-val">25.0%</div><div class="assump-sub">미국 연방+주</div></div>
+    <div class="assump-pill"><div class="assump-label">Net Debt</div><div class="assump-val">$0M</div><div class="assump-sub">현금 우위 추정</div></div>
+    <div class="assump-pill"><div class="assump-label">발행주식 (XOVR)</div><div class="assump-val">29.3M</div><div class="assump-sub">NAV/share $40 기준</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">투자자 IRR 매트릭스 (ETF 보유자 관점, 5Y Hold)</div>
+      <div class="card-sub">매수가 $40 가정 · 2030E NAV/share 시나리오</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">시나리오</th>
+            <th>매수가</th>
+            <th>2030E NAV/share</th>
+            <th>총수익 (5Y)</th>
+            <th>연환산 IRR</th>
+            <th>판단</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">Bull <span class="badge scenario-bull">강세</span></td><td>$40</td><td class="up">$135</td><td class="up">+237%</td><td class="up">+27.5%</td><td class="up">우수</td></tr>
+          <tr><td class="label">Base <span class="badge scenario-base">기본</span></td><td>$40</td><td class="yellow">$79</td><td class="yellow">+97%</td><td class="yellow">+14.6%</td><td class="yellow">양호</td></tr>
+          <tr><td class="label">Bear <span class="badge scenario-bear">약세</span></td><td>$40</td><td class="down">$44</td><td class="down">+10%</td><td class="down">+1.9%</td><td class="down">열위</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="note">
+    <span class="nh">Task 3 인풋 정리</span>이 표의 (i) 5Y FCF, (ii) Terminal Value, (iii) WACC/g 가정, (iv) 시나리오별 NAV/share를 받아 Task 3에서 (a) 운용사 가상 DCF Valuation, (b) ETF 보유자 IRR 분포, (c) Football Field 차트를 산출한다. ETF의 “가격”과 “NAV”는 일치하지 않을 수 있어 디스카운트/프리미엄 보정이 별도 필요.
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">민감도 매트릭스 — SpaceX IPO 가격 × 락업 기간 (Base 케이스 2030E NAV/share, USD)</div>
+      <div class="card-sub">SpaceX 평가가치의 시사 가치별 × 락업 만기별 NAV/share</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="fin">
+        <thead>
+          <tr>
+            <th style="text-align:left">IPO 가격 \ 락업</th>
+            <th>락업 90일</th>
+            <th>락업 180일</th>
+            <th>락업 270일</th>
+            <th>락업 360일</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="label">$2.0T</td><td class="up">125</td><td class="up">118</td><td class="up">112</td><td class="up">105</td></tr>
+          <tr><td class="label">$1.75T</td><td class="up">102</td><td class="up">95</td><td class="up">89</td><td class="up">83</td></tr>
+          <tr><td class="label">$1.5T (현재 마크 부근)</td><td class="yellow">85</td><td class="yellow">79</td><td class="yellow">73</td><td class="yellow">68</td></tr>
+          <tr><td class="label">$1.25T</td><td>67</td><td>62</td><td>57</td><td>53</td></tr>
+          <tr><td class="label">$1.0T</td><td class="down">50</td><td class="down">46</td><td class="down">42</td><td class="down">39</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong style="color:var(--body);">출처</strong> ·
+  <a href="https://entrepreneurshares.com/xovr-etf/">XOVR — ERShares Official</a> ·
+  <a href="https://www.prnewswire.com/news-releases/xovr-lifts-spacex-exposure-to-23-of-fund-with--35m-buy-302778900.html">PR Newswire (2026-05-21 마크 갱신)</a> ·
+  <a href="https://www.morningstar.com/alternative-investments/lessons-private-markets-bust-why-this-etfs-investors-missed-out-spacex-gains">Morningstar (Jeffrey Ptak)</a> ·
+  <a href="https://www.etf.com/sections/features/xovrs-spacex-meltdown-warning-every-private-asset-etf">ETF.com</a> ·
+  <a href="https://stockanalysis.com/etf/xovr/">Stock Analysis</a> ·
+  <a href="https://entrepreneurshares.com/leadership/">ERShares Leadership</a>
+
+  <div class="disclaimer">
+    본 모델은 학습·리서치 목적의 추정 모델이며, EntrepreneurShares LLC의 공식 회계자료가 아닙니다. 모든 수치는 공개 자료 기반 외삽 또는 가정값이며, 실제 펀드 NAV·운용사 손익과 다를 수 있습니다. 비상장 SPV의 평가가치는 운용사 평가위원회의 재량 판단에 따라 변동되며, 외부 가정 모델로는 정확한 미래 NAV를 예측할 수 없습니다. 본 자료는 매매 권유가 아니며, 투자 결정 전 펀드 프로스펙터스 및 최근 공시를 직접 확인하세요.
+  </div>
+</footer>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + id).classList.add('active');
+      window.scrollTo({top: tab.getBoundingClientRect().top + window.scrollY - 100, behavior:'smooth'});
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
