@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이크론 테크놀로지 (MU) — FY2026 3분기 어닝스 프리뷰</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --canvas-dark:      #0b0e11;
+    --surface-card:     #1e2329;
+    --surface-elevated: #2b3139;
+    --hairline:         #2b3139;
+    --primary:          #FCD535;
+    --primary-active:   #f0b90b;
+    --body:             #eaecef;
+    --muted:            #707a8a;
+    --muted-strong:     #929aa5;
+    --on-dark:          #ffffff;
+    --trading-up:       #0ecb81;
+    --trading-down:     #f6465d;
+    --info:             #3b82f6;
+    --font-body:        'Inter', -apple-system, sans-serif;
+    --font-num:         'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--canvas-dark);
+    color: var(--body);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── TOP NAV ── */
+  .top-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--canvas-dark);
+    border-bottom: 1px solid var(--hairline);
+    padding: 0 32px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand { font-weight: 700; font-size: 16px; color: var(--primary); letter-spacing: -0.3px; }
+  .nav-meta  { font-size: 12px; color: var(--muted); font-family: var(--font-num); }
+  .nav-badge {
+    background: var(--trading-up); color: #000; font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; margin-left: 12px;
+  }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+  section { padding: 48px 0; border-bottom: 1px solid var(--hairline); }
+  section:last-child { border-bottom: none; }
+
+  /* ── HERO ── */
+  .hero { padding: 56px 0 40px; }
+  .hero-eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--primary); margin-bottom: 12px;
+  }
+  .hero-title {
+    font-size: 40px; font-weight: 700; color: var(--on-dark);
+    line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 8px;
+  }
+  .hero-sub {
+    font-size: 20px; font-weight: 500; color: var(--muted-strong); margin-bottom: 24px;
+  }
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 6px 14px; font-size: 13px;
+  }
+  .badge-label { color: var(--muted); }
+  .badge-value { font-weight: 600; font-family: var(--font-num); }
+  .badge-value.up    { color: var(--trading-up); }
+  .badge-value.down  { color: var(--trading-down); }
+  .badge-value.gold  { color: var(--primary); }
+  .badge-value.white { color: var(--on-dark); }
+
+  /* ── SECTION HEADERS ── */
+  .sec-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 28px;
+  }
+  .sec-num {
+    background: var(--primary); color: #000; font-weight: 700;
+    font-size: 12px; padding: 2px 8px; border-radius: 4px; font-family: var(--font-num);
+  }
+  .sec-title { font-size: 22px; font-weight: 700; color: var(--on-dark); }
+
+  /* ── KEY TAKEAWAYS ── */
+  .takeaways-card {
+    background: var(--surface-card); border: 1px solid var(--primary);
+    border-radius: 12px; padding: 28px 32px;
+  }
+  .takeaways-title {
+    font-size: 13px; font-weight: 600; color: var(--primary);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .takeaway-item {
+    display: flex; gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--hairline); align-items: flex-start;
+  }
+  .takeaway-item:last-child { border-bottom: none; }
+  .takeaway-dot {
+    width: 6px; height: 6px; background: var(--primary); border-radius: 50%;
+    flex-shrink: 0; margin-top: 6px;
+  }
+  .takeaway-text { font-size: 14px; color: var(--body); line-height: 1.6; }
+
+  /* ── SNAPSHOT TABLE ── */
+  .snapshot-table {
+    width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--hairline);
+  }
+  .snapshot-table th {
+    background: var(--surface-elevated); color: var(--muted-strong);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 16px; text-align: center;
+  }
+  .snapshot-table th:first-child { text-align: left; }
+  .snapshot-table td {
+    padding: 13px 16px; border-bottom: 1px solid var(--hairline);
+    text-align: center; font-family: var(--font-num); font-size: 14px;
+  }
+  .snapshot-table td:first-child {
+    text-align: left; font-family: var(--font-body); font-weight: 600;
+    color: var(--body); font-size: 13px;
+  }
+  .snapshot-table tr:last-child td { border-bottom: none; }
+  .snapshot-table tr:hover td { background: var(--surface-card); }
+  .snapshot-table td.guide { background: rgba(252,213,53,0.08); color: var(--primary); font-weight: 700; }
+  .snapshot-table td.cons  { color: var(--trading-up); font-weight: 600; }
+  .snapshot-table td.actual { color: var(--on-dark); }
+
+  /* ── CHART GRID ── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .chart-card {
+    background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 12px; padding: 24px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-size: 13px; font-weight: 600; color: var(--muted-strong);
+    margin-bottom: 16px; letter-spacing: 0.5px;
+  }
+  .chart-caption {
+    font-size: 11px; color: var(--muted); margin-top: 8px; text-align: center;
+  }
+
+  /* ── STAT CALLOUTS ── */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat-card {
+    background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 12px; padding: 20px 24px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .stat-val   { font-size: 32px; font-weight: 700; font-family: var(--font-num); color: var(--primary); line-height: 1; }
+  .stat-sub   { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: var(--font-num); }
+  .stat-val.green { color: var(--trading-up); }
+  .stat-val.white { color: var(--on-dark); }
+
+  /* ── BODY TEXT ── */
+  .body-text { font-size: 14px; color: var(--body); line-height: 1.75; margin-bottom: 16px; }
+  .highlight { color: var(--primary); font-weight: 600; }
+  .green-text { color: var(--trading-up); font-weight: 600; }
+  .red-text   { color: var(--trading-down); font-weight: 600; }
+
+  /* ── BULLET LIST ── */
+  .bullet-list { list-style: none; padding: 0; }
+  .bullet-list li {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid var(--hairline); font-size: 14px; color: var(--body); line-height: 1.6;
+  }
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-list li::before {
+    content: '▸'; color: var(--primary); font-size: 10px; margin-top: 4px; flex-shrink: 0;
+  }
+
+  /* ── VALUATION SCENARIOS ── */
+  .scenario-table {
+    width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--hairline); margin-bottom: 12px;
+  }
+  .scenario-table th {
+    background: var(--surface-elevated); color: var(--muted-strong);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 16px; text-align: center;
+  }
+  .scenario-table td {
+    padding: 14px 16px; border-bottom: 1px solid var(--hairline);
+    text-align: center; font-family: var(--font-num); font-size: 14px;
+  }
+  .scenario-table tr:last-child td { border-bottom: none; }
+  .scenario-table .bear td { color: var(--trading-down); }
+  .scenario-table .base td { color: var(--primary); font-weight: 700; background: rgba(252,213,53,0.05); }
+  .scenario-table .bull td { color: var(--trading-up); }
+
+  /* ── RISK TABLE ── */
+  .risk-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--hairline); }
+  .risk-table th {
+    background: var(--surface-elevated); color: var(--muted-strong);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 16px; text-align: left;
+  }
+  .risk-table td {
+    padding: 14px 16px; border-bottom: 1px solid var(--hairline);
+    font-size: 13px; vertical-align: top; color: var(--body);
+  }
+  .risk-table tr:last-child td { border-bottom: none; }
+  .risk-table .risk-name { font-weight: 700; color: var(--on-dark); white-space: nowrap; }
+  .prob-high   { color: var(--trading-down); font-weight: 600; font-family: var(--font-num); }
+  .prob-med    { color: var(--primary);       font-weight: 600; font-family: var(--font-num); }
+  .prob-low    { color: var(--trading-up);    font-weight: 600; font-family: var(--font-num); }
+
+  /* ── STRATEGY TABLE ── */
+  .strategy-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--hairline); }
+  .strategy-table th {
+    background: var(--surface-elevated); color: var(--muted-strong);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    padding: 12px 16px; text-align: left;
+  }
+  .strategy-table td {
+    padding: 14px 16px; border-bottom: 1px solid var(--hairline);
+    font-size: 13px; vertical-align: top; color: var(--body);
+  }
+  .strategy-table tr:last-child td { border-bottom: none; }
+  .strategy-type { font-weight: 700; color: var(--primary); white-space: nowrap; }
+
+  /* ── SOURCES ── */
+  .sources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .source-item {
+    background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .source-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .source-link  { font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 500; }
+  .source-link:hover { text-decoration: underline; }
+
+  /* ── DISCLAIMER ── */
+  .disclaimer {
+    background: var(--surface-card); border: 1px solid var(--hairline);
+    border-radius: 8px; padding: 16px 20px; margin-top: 32px;
+    font-size: 11px; color: var(--muted); line-height: 1.6;
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    background: #fafafa; color: #181a20; padding: 32px;
+    text-align: center; font-size: 12px;
+  }
+  .page-footer a { color: #181a20; }
+
+  /* ── TWO COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  /* ── GUIDE VS CONSENSUS MINI TABLE ── */
+  .preview-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; border: 1px solid var(--hairline); }
+  .preview-table th {
+    background: var(--surface-elevated); color: var(--muted-strong);
+    font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    padding: 10px 14px; text-align: center;
+  }
+  .preview-table th:first-child { text-align: left; }
+  .preview-table td {
+    padding: 12px 14px; border-bottom: 1px solid var(--hairline);
+    text-align: center; font-family: var(--font-num); font-size: 13px;
+  }
+  .preview-table td:first-child { text-align: left; font-family: var(--font-body); font-size: 13px; font-weight: 500; }
+  .preview-table tr:last-child td { border-bottom: none; }
+
+  @media (max-width: 900px) {
+    .chart-grid, .chart-grid-3, .two-col, .sources-grid, .stat-row { grid-template-columns: 1fr; }
+    .chart-card.full { grid-column: 1; }
+    .hero-title { font-size: 28px; }
+    .container { padding: 0 16px; }
+    .top-nav { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-brand">EQUITY RESEARCH · 반도체</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span class="nav-meta">마이크론 테크놀로지 (NASDAQ: MU)</span>
+    <span class="nav-badge">STRONG BUY</span>
+    <span class="nav-meta" style="margin-left:4px;">PT $1,100 · 2026.06.15</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════ -->
+<div class="container">
+  <div class="hero">
+    <div class="hero-eyebrow">FY2026 3분기 어닝스 프리뷰 · 발표일: 2026년 6월 24일</div>
+    <div class="hero-title">기록적 매출 슈퍼사이클,<br>새로운 국면으로 진입</div>
+    <div class="hero-sub">HBM 완판 구조 + 81% 마진 가이던스 — 레거시 메모리 사이클의 완전한 종언</div>
+    <div class="hero-meta">
+      <div class="badge">
+        <span class="badge-label">레이팅</span>
+        <span class="badge-value up">STRONG BUY</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">목표주가</span>
+        <span class="badge-value gold">$1,100</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">현재가(추정)</span>
+        <span class="badge-value white">~$1,000</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">YTD 수익률</span>
+        <span class="badge-value up">+70%+</span>
+      </div>
+      <div class="badge">
+        <span class="badge-label">어닝스 발표</span>
+        <span class="badge-value white">2026.06.24</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── KEY STATS ── -->
+  <div class="stat-row" style="margin-bottom:28px;">
+    <div class="stat-card">
+      <div class="stat-label">Q3 매출 가이던스</div>
+      <div class="stat-val">$33.5B</div>
+      <div class="stat-sub">±$750M · YoY +278%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">컨센서스 매출 추정</div>
+      <div class="stat-val green">$34.8B</div>
+      <div class="stat-sub">가이던스 대비 +4% 상회</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Non-GAAP EPS 가이던스</div>
+      <div class="stat-val">$19.15</div>
+      <div class="stat-sub">컨센서스 $19.82</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Gross Margin 가이던스</div>
+      <div class="stat-val white">81%</div>
+      <div class="stat-sub">역대 최고 · Q2 대비 +6pp</div>
+    </div>
+  </div>
+
+  <!-- ── KEY TAKEAWAYS ── -->
+  <div class="takeaways-card" style="margin-bottom:40px;">
+    <div class="takeaways-title">🔑 핵심 요약 — 6월 24일 발표 전 체크리스트</div>
+    <div class="takeaway-item">
+      <div class="takeaway-dot"></div>
+      <div class="takeaway-text">매출 가이던스 $33.5B는 전년 동기(Q3 FY25 $8.87B) 대비 <strong style="color:var(--primary)">+278% YoY</strong> 성장 — 반도체 메모리 역사상 전례 없는 분기 가속</div>
+    </div>
+    <div class="takeaway-item">
+      <div class="takeaway-dot"></div>
+      <div class="takeaway-text">컨센서스 $34.8B은 가이던스 상단을 넘어서 — 8분기 중 7번 가이던스를 상회한 패턴 반복 기대</div>
+    </div>
+    <div class="takeaway-item">
+      <div class="takeaway-dot"></div>
+      <div class="takeaway-text"><strong style="color:var(--primary)">HBM3E·HBM4 공급 CY2026 말까지 완판(binding contracts)</strong> — 하이퍼스케일러 3~5년 공급 계약으로 수익 가시성 확보</div>
+    </div>
+    <div class="takeaway-item">
+      <div class="takeaway-dot"></div>
+      <div class="takeaway-text">81% 가이던스 GM은 NVIDIA 데이터센터 세그먼트 수준 — 메모리 제조사 역사상 처음으로 AI 인프라 기업 수준 마진 달성</div>
+    </div>
+    <div class="takeaway-item">
+      <div class="takeaway-dot"></div>
+      <div class="takeaway-text">옵션 시장 내재 변동성 ±10% — 투자 스타일별 포지셔닝 전략 필요 (섹션 6 참조)</div>
+    </div>
+  </div>
+
+  <!-- ── SNAPSHOT TABLE ── -->
+  <div class="sec-header">
+    <div class="sec-num">01</div>
+    <div class="sec-title">실적 스냅샷</div>
+  </div>
+  <table class="snapshot-table" style="margin-bottom:40px;">
+    <thead>
+      <tr>
+        <th>지표</th>
+        <th>Q3 FY25 (실적)</th>
+        <th>Q2 FY26 (실적)</th>
+        <th>Q3 FY26E 가이던스</th>
+        <th>Q3 FY26E 컨센서스</th>
+        <th>자체 추정</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>매출 ($B)</td>
+        <td class="actual">$8.87</td>
+        <td class="actual">$23.86</td>
+        <td class="guide">$33.5 ±$0.75</td>
+        <td class="cons">$34.8</td>
+        <td style="color:var(--on-dark);font-weight:600;">$34.5</td>
+      </tr>
+      <tr>
+        <td>YoY 매출 성장률</td>
+        <td class="actual">—</td>
+        <td class="actual" style="color:var(--trading-up);">+196%</td>
+        <td class="guide">+278%E</td>
+        <td class="cons">+293%E</td>
+        <td style="color:var(--trading-up);">+289%E</td>
+      </tr>
+      <tr>
+        <td>Non-GAAP EPS ($)</td>
+        <td class="actual">$1.73</td>
+        <td class="actual">$12.20</td>
+        <td class="guide">$19.15 ±$0.40</td>
+        <td class="cons">$19.82</td>
+        <td style="color:var(--on-dark);font-weight:600;">$19.60</td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td class="actual">35.9%</td>
+        <td class="actual">75.0%</td>
+        <td class="guide">~81%</td>
+        <td class="cons">~81%</td>
+        <td style="color:var(--on-dark);">81~83%</td>
+      </tr>
+      <tr>
+        <td>영업현금흐름 ($B)</td>
+        <td class="actual">~$2.5</td>
+        <td class="actual">$11.9</td>
+        <td class="guide">~$18B E</td>
+        <td class="cons">—</td>
+        <td>~$18B</td>
+      </tr>
+      <tr>
+        <td>CapEx ($B)</td>
+        <td class="actual">~$3.0</td>
+        <td class="actual">~$5.2</td>
+        <td class="guide">~$7.0</td>
+        <td class="cons">~$7.0</td>
+        <td>~$7.0</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:40px;">출처: Micron Technology Q2 FY2026 Earnings Release (2026.03.18); 애널리스트 컨센서스 2026.06.15 기준</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2: QUARTERLY TREND CHARTS
+════════════════════════════════════════════════ -->
+<div style="background:var(--canvas-dark);padding:48px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-num">02</div>
+      <div class="sec-title">분기별 실적 추이</div>
+    </div>
+    <div class="chart-grid" style="margin-bottom:20px;">
+      <div class="chart-card">
+        <div class="chart-title">분기별 매출 추이 ($B)</div>
+        <canvas id="revenueChart" height="240"></canvas>
+        <div class="chart-caption">출처: Micron IR, 애널리스트 컨센서스 | Q3 FY26E는 추정치</div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">분기별 Non-GAAP EPS ($)</div>
+        <canvas id="epsChart" height="240"></canvas>
+        <div class="chart-caption">출처: Micron IR, 애널리스트 컨센서스 | Q3 FY26E는 추정치</div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <div class="chart-title">분기별 Gross Margin (%)</div>
+        <canvas id="gmChart" height="240"></canvas>
+        <div class="chart-caption">출처: Micron IR | Q3 FY26E는 가이던스 기준</div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">YoY 매출 성장률 (%)</div>
+        <canvas id="yoyChart" height="240"></canvas>
+        <div class="chart-caption">출처: Micron IR, 컨센서스 | Q3 FY26E 추정치</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3: Q2 FY26 RESULTS CONTEXT
+════════════════════════════════════════════════ -->
+<div class="container">
+  <section>
+    <div class="sec-header">
+      <div class="sec-num">03</div>
+      <div class="sec-title">Q2 FY2026 실적 컨텍스트 (최근 발표 분기)</div>
+    </div>
+    <p class="body-text">
+      Q2 FY2026(2026년 2월 26일 종료, 3월 18일 발표)은 마이크론 역사상 <span class="highlight">최대 어닝스 서프라이즈</span>를 기록했습니다.
+      매출 $23.86B은 컨센서스 $19.19B를 <span class="green-text">+$4.67B(+24.3%)</span> 상회,
+      EPS $12.20은 컨센서스 $8.79를 <span class="green-text">+$3.41(+38.8%)</span> 초과했습니다.
+    </p>
+    <ul class="bullet-list">
+      <li>매출 $23.86B vs. 컨센서스 $19.19B — <strong style="color:var(--trading-up);">+24.3% 서프라이즈</strong></li>
+      <li>Non-GAAP EPS $12.20 vs. 컨센서스 $8.79 — <strong style="color:var(--trading-up);">+38.8% 서프라이즈</strong></li>
+      <li>Gross Margin 75% — QoQ +18pp, 역대 최고 경신</li>
+      <li>영업이익 $16.5B — 영업이익률 69%, AI 인프라 기업 수준</li>
+      <li>영업현금흐름 $11.9B (전 분기 $8.4B → +41% QoQ)</li>
+      <li>Q3 매출 가이던스 $33.5B ±$750M 제시 — Q2 대비 +40% 추가 성장 예고</li>
+    </ul>
+    <p class="body-text" style="margin-top:16px;">
+      이 규모의 서프라이즈는 셀사이드 모델들이 HBM 가격 결정력과 데이터센터 메모리 채택 속도를
+      <span class="highlight">심각하게 과소평가</span>했음을 보여줍니다. Q2 이후 다수 증권사가 목표주가를 50~100% 상향했습니다.
+    </p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4: HBM SUPERCYCLE
+════════════════════════════════════════════════ -->
+<div style="background:var(--surface-card);padding:48px 0;">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-num">04</div>
+      <div class="sec-title">HBM 슈퍼사이클 투자 테제</div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <p style="font-size:15px;font-weight:600;color:var(--on-dark);margin-bottom:12px;">구조적 수요 드라이버</p>
+        <ul class="bullet-list">
+          <li>NVIDIA H100/H200/B100 GPU당 HBM3E 스택 6~8개 탑재 — AI GPU 출하 증가와 함께 메모리 수요 폭증</li>
+          <li>데이터센터가 글로벌 DRAM 생산량의 약 <strong style="color:var(--primary);">70%</strong> 소화 — PC·모바일 회복 여지 제한</li>
+          <li>HBM3E·HBM4 주요 하이퍼스케일러(MS·Google·AWS·Meta) 자격 심사 완료, 양산 중</li>
+          <li>CEO 산자이 메로트라: "CY2026 말까지 HBM 공급 완전 계약됨(binding contracts)"</li>
+          <li>DRAM·NAND 공급-수요 타이트 상황 2026년 이후에도 지속 전망</li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-size:15px;font-weight:600;color:var(--on-dark);margin-bottom:12px;">경쟁 포지셔닝</p>
+        <ul class="bullet-list">
+          <li><strong>전력 효율:</strong> 마이크론 HBM3E는 GB/s당 전력 ~10% 절감 — 하이퍼스케일러 PUE·에너지 비용 관리 핵심 지표</li>
+          <li><strong>삼성 리스크:</strong> 삼성전자 HBM 수율 문제 지속 — 마이크론 점유율 확대 기회</li>
+          <li><strong>HBM4 로드맵:</strong> CY2027 HBM4 양산 예정, 차세대 계약 선점 중</li>
+          <li><strong>CapEx 확신:</strong> FY2026 CapEx $25B+, FY2027 "대폭 증가" — 장기 수요에 대한 경영진 확신</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="chart-card" style="margin-top:28px;">
+      <div class="chart-title">HBM 글로벌 시장 규모 vs. 마이크론 HBM 매출 추정 ($B)</div>
+      <canvas id="hbmChart" height="220"></canvas>
+      <div class="chart-caption">출처: 업계 추정치, Micron 경영진 코멘트 | 2026E 이후는 추정치</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5: Q3 PREVIEW — WHAT TO WATCH
+════════════════════════════════════════════════ -->
+<div class="container">
+  <section>
+    <div class="sec-header">
+      <div class="sec-num">05</div>
+      <div class="sec-title">6월 24일 발표 — 주목할 포인트</div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:28px;">
+      <div>
+        <div class="chart-card">
+          <div class="chart-title">Q3 FY26 매출: 가이던스 vs. 컨센서스 ($B)</div>
+          <canvas id="guideChart" height="200"></canvas>
+          <div class="chart-caption">출처: Micron IR (2026.03); 컨센서스 2026.06.15</div>
+        </div>
+      </div>
+      <div>
+        <div class="chart-card">
+          <div class="chart-title">Q3 FY26 EPS: 가이던스 vs. 컨센서스 ($)</div>
+          <canvas id="epsGuideChart" height="200"></canvas>
+          <div class="chart-caption">출처: Micron IR (2026.03); 컨센서스 2026.06.15</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="preview-table" style="margin-bottom:20px;">
+      <thead>
+        <tr>
+          <th>주목 지표</th>
+          <th>경영진 가이던스</th>
+          <th>컨센서스</th>
+          <th>자체 추정</th>
+          <th>중요도</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>매출</td>
+          <td style="color:var(--primary);">$33.5B ±$750M</td>
+          <td style="color:var(--trading-up);">$34.8B</td>
+          <td style="color:var(--on-dark);font-weight:600;">$34.5B</td>
+          <td><span class="prob-high">매우 높음</span></td>
+        </tr>
+        <tr>
+          <td>Non-GAAP EPS</td>
+          <td style="color:var(--primary);">$19.15 ±$0.40</td>
+          <td style="color:var(--trading-up);">$19.82</td>
+          <td style="color:var(--on-dark);font-weight:600;">$19.60</td>
+          <td><span class="prob-high">매우 높음</span></td>
+        </tr>
+        <tr>
+          <td>Gross Margin</td>
+          <td style="color:var(--primary);">~81%</td>
+          <td style="color:var(--trading-up);">~81%</td>
+          <td style="color:var(--on-dark);">81~83%</td>
+          <td><span class="prob-high">높음</span></td>
+        </tr>
+        <tr>
+          <td>Q4 FY26 매출 가이던스</td>
+          <td style="color:var(--muted);">미발표</td>
+          <td style="color:var(--trading-up);">~$38~40B</td>
+          <td style="color:var(--on-dark);">~$38B</td>
+          <td><span class="prob-high">매우 높음 🔑</span></td>
+        </tr>
+        <tr>
+          <td>FY26 전체 CapEx</td>
+          <td style="color:var(--primary);">&gt;$25B</td>
+          <td style="color:var(--trading-up);">&gt;$25B</td>
+          <td style="color:var(--on-dark);">&gt;$25B</td>
+          <td><span class="prob-med">중간</span></td>
+        </tr>
+        <tr>
+          <td>HBM4 타임라인 업데이트</td>
+          <td style="color:var(--muted);">미발표</td>
+          <td style="color:var(--muted);">—</td>
+          <td style="color:var(--on-dark);">CY2027 H1</td>
+          <td><span class="prob-high">높음 ✨</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--muted);">🔑 Q4 가이던스가 $36B 이상이어야 현재 밸류에이션 유지 가능. ✨ HBM4 조기 양산 언급 시 목표주가 재상향 트리거.</p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6: VALUATION
+════════════════════════════════════════════════ -->
+<div style="background:var(--surface-card);padding:48px 0;">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-num">06</div>
+      <div class="sec-title">밸류에이션 & 목표주가</div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:32px;">
+      <div>
+        <div class="chart-card">
+          <div class="chart-title">연간 Non-GAAP EPS 전망 ($)</div>
+          <canvas id="annualEpsChart" height="220"></canvas>
+          <div class="chart-caption">출처: Micron IR; FY2026E·FY2027E 컨센서스</div>
+        </div>
+      </div>
+      <div>
+        <div class="chart-card">
+          <div class="chart-title">OCF / CapEx / FCF 추이 ($B)</div>
+          <canvas id="cfChart" height="220"></canvas>
+          <div class="chart-caption">출처: Micron IR; Q3 FY26E 추정치</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="body-text">
+      현재 주가 ~$1,000, FY2026 컨센서스 EPS ~$58 기준 <span class="highlight">약 17x FY2026 P/E</span>에 거래 중.
+      코모디티 메모리 사이클에서 8~12x PER이었던 역사적 벨류에이션 대비 <span class="highlight">구조적 프리미엄</span>이 붙은 상태.
+    </p>
+
+    <table class="scenario-table">
+      <thead>
+        <tr>
+          <th>시나리오</th>
+          <th>핵심 가정</th>
+          <th>FY26 EPS</th>
+          <th>적용 PER</th>
+          <th>목표주가</th>
+          <th>현재가 대비</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="bear">
+          <td>베어 🐻</td>
+          <td style="text-align:left;font-family:var(--font-body);font-size:12px;color:var(--muted);">AI 수요 둔화, 삼성 HBM 수율 회복</td>
+          <td>$45</td>
+          <td>13x</td>
+          <td style="font-weight:700;">$585</td>
+          <td>-41%</td>
+        </tr>
+        <tr class="base">
+          <td>베이스 ⭐</td>
+          <td style="text-align:left;font-family:var(--font-body);font-size:12px;color:var(--muted);">HBM 수요 CY2027까지 지속, 마진 유지</td>
+          <td>$58</td>
+          <td>19x</td>
+          <td style="font-weight:700;">$1,100</td>
+          <td>+10%</td>
+        </tr>
+        <tr class="bull">
+          <td>불 🚀</td>
+          <td style="text-align:left;font-family:var(--font-body);font-size:12px;color:var(--muted);">HBM4 조기 양산, 마진 추가 확장</td>
+          <td>$70</td>
+          <td>22x</td>
+          <td style="font-weight:700;">$1,540</td>
+          <td>+54%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;">목표주가 $1,100은 FY2026 컨센서스 EPS $58에 19x PER 적용. 시나리오는 HBM 수요 지속성과 마진 유지 여부에 따른 분산.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 7: RISK & STRATEGY
+════════════════════════════════════════════════ -->
+<div class="container">
+  <section>
+    <div class="sec-header">
+      <div class="sec-num">07</div>
+      <div class="sec-title">리스크 요인</div>
+    </div>
+    <table class="risk-table" style="margin-bottom:40px;">
+      <thead>
+        <tr>
+          <th style="width:15%;">리스크</th>
+          <th style="width:50%;">내용</th>
+          <th style="width:15%;">발생 확률</th>
+          <th style="width:20%;">임팩트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="risk-name">CapEx 오버런</span></td>
+          <td>FY26 CapEx $25B+ 및 FY27 "대폭 증가"는 수요 약화 시 FCF 압박 우려</td>
+          <td><span class="prob-med">중간</span></td>
+          <td><span class="prob-high">매우 높음</span></td>
+        </tr>
+        <tr>
+          <td><span class="risk-name">AI 수요 둔화</span></td>
+          <td>하이퍼스케일러 capex 축소 또는 AI 모델 효율 개선으로 메모리 탑재량 감소 가능</td>
+          <td><span class="prob-low">낮음~중간</span></td>
+          <td><span class="prob-high">매우 높음</span></td>
+        </tr>
+        <tr>
+          <td><span class="risk-name">삼성 회복</span></td>
+          <td>삼성전자 HBM 수율 문제 해결 시 공급 증가 → HBM ASP 하락 압력</td>
+          <td><span class="prob-med">중간</span></td>
+          <td><span class="prob-high">높음</span></td>
+        </tr>
+        <tr>
+          <td><span class="risk-name">중국 수출 규제</span></td>
+          <td>美-中 반도체 규제 강화로 중국 시장(매출 약 10%) 접근 제한 가능</td>
+          <td><span class="prob-low">낮음</span></td>
+          <td><span class="prob-med">중간</span></td>
+        </tr>
+        <tr>
+          <td><span class="risk-name">밸류에이션 리스크</span></td>
+          <td>17x FY26 PER로 "완벽 가격 반영" 상태 — 가이던스 미스 또는 톤 변화 시 15~25% 조정 가능</td>
+          <td><span class="prob-med">중간</span></td>
+          <td><span class="prob-high">높음</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="sec-header">
+      <div class="sec-num">08</div>
+      <div class="sec-title">투자 전략 제시</div>
+    </div>
+    <table class="strategy-table">
+      <thead>
+        <tr>
+          <th style="width:16%;">투자 유형</th>
+          <th style="width:42%;">발표 전 전략 (6월 24일 이전)</th>
+          <th style="width:42%;">발표 후 전략</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="strategy-type">장기 투자 (12개월+)</span></td>
+          <td>$900 이하 분할 매수. HBM CY2026 계약 가시성으로 강한 확신 유지 가능</td>
+          <td>어닝스 후 10%+ 조정 시 추가 매수. 목표주가 $1,100 기준 19x FY26 EPS $58</td>
+        </tr>
+        <tr>
+          <td><span class="strategy-type">전술적 (1~3개월)</span></td>
+          <td>발표 전 목표 비중의 50%로 줄이고, ±10% 내재 변동성 활용 스트래들 매수</td>
+          <td>어닝스 비트 시 전체 비중 복원; 미스 시 200일 이동평균(~$820) 지지 확인 후 재진입</td>
+        </tr>
+        <tr>
+          <td><span class="strategy-type">커버드콜 전략</span></td>
+          <td>6월 30일 만기 $1,050 콜 매도 — 이벤트 전 IV 상승으로 프리미엄 극대화</td>
+          <td>발표 후 8월물 $1,100~1,150 콜로 롤 — 상승 참여 유지하며 수익 보호</td>
+        </tr>
+        <tr>
+          <td><span class="strategy-type">단기/헤지펀드</span></td>
+          <td>7월 $1,050~1,100 콜 매수 또는 MU 롱 vs. SOX 인덱스 숏 페어 트레이드</td>
+          <td>전일 종가 대비 +5% 초과 스파이크 시 익절; 코어 포지션은 Q4 가이던스 카탈리스트까지 유지</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="body-text" style="margin-top:20px;font-style:italic;color:var(--muted-strong);">
+      핵심 투자 테제는 변하지 않음: 마이크론은 코모디티 메모리 사이클에서 영구적으로 벗어나,
+      희소한 AI 인프라 자산으로 재평가받고 있습니다. 6월 24일 어닝스 이벤트는 테제 테스트가 아닌 카탈리스트 체크포인트입니다.
+    </p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 8: SOURCES
+════════════════════════════════════════════════ -->
+<div style="background:var(--surface-card);padding:48px 0;">
+  <div class="container">
+    <div class="sec-header">
+      <div class="sec-num">09</div>
+      <div class="sec-title">출처 및 참고자료</div>
+    </div>
+    <div class="sources-grid">
+      <div class="source-item">
+        <div class="source-label">Q2 FY2026 실적 발표 (2026.03.18)</div>
+        <a class="source-link" href="https://investors.micron.com/news-releases/news-release-details/micron-technology-inc-reports-results-second-quarter-fiscal-2026" target="_blank">Micron Technology IR — Q2 FY2026 Earnings Release</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">SEC EDGAR Form 8-K / Press Release</div>
+        <a class="source-link" href="https://www.sec.gov/Archives/edgar/data/0000723125/000072312526000004/a2026q2ex991-pressrelease.htm" target="_blank">SEC EDGAR — MU 8-K FY2026 Q2</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">Form 10-Q (FY2026)</div>
+        <a class="source-link" href="https://www.sec.gov/Archives/edgar/data/0000723125/000072312526000006/mu-20260226.htm" target="_blank">SEC EDGAR — MU 10-Q FY2026</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">Q3 FY2026 발표 일정 공지</div>
+        <a class="source-link" href="https://www.globenewswire.com/news-release/2026/05/27/3302360/14450/en/micron-technology-to-report-fiscal-third-quarter-results-on-june-24-2026.html" target="_blank">GlobeNewswire — Micron Q3 FY2026 Results June 24</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">Q1 FY2026 실적 분석</div>
+        <a class="source-link" href="https://futurumgroup.com/insights/micron-technology-q1-fy-2026-sets-records-strong-q2-outlook/" target="_blank">Futurum — MU Q1 FY2026 Sets Records</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">HBM 강세론 분석</div>
+        <a class="source-link" href="https://www.investing.com/analysis/microns-soldout-hbm-supply-makes-the-bull-case-hard-to-dismiss-200681391" target="_blank">Investing.com — Micron HBM Sold-Out Bull Case</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">애널리스트 목표주가 분석 (2026)</div>
+        <a class="source-link" href="https://www.tikr.com/blog/micron-stock-is-up-70-in-2026-heres-why-analysts-still-see-more-upside-ahead" target="_blank">TIKR — MU Stock Up 70% in 2026</a>
+      </div>
+      <div class="source-item">
+        <div class="source-label">Q3 프리뷰 / 6월 24일 예측</div>
+        <a class="source-link" href="https://www.fool.com/investing/2026/06/01/prediction-micron-stock-will-skyrocket-after-june/" target="_blank">Motley Fool — MU Prediction After June 24</a>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <strong>고지사항:</strong> 본 리포트는 정보 제공 목적으로만 작성되었으며, 투자 권유 또는 증권 매매 청약을 구성하지 않습니다.
+      과거 실적은 미래 결과를 보장하지 않습니다. 모든 추정치와 목표주가는 독립적 분석에 기반하며 다른 리서치와 차이가 있을 수 있습니다.
+      투자자는 자체적인 실사(Due Diligence)를 수행해야 합니다. 작성일: 2026년 6월 15일.
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="page-footer">
+  <p>EQUITY RESEARCH · 반도체 · 마이크론 테크놀로지 (MU) · FY2026 3Q Preview</p>
+  <p style="margin-top:4px;color:#707a8a;">작성일 2026.06.15 · 정보 제공 목적 전용 · 투자 권유 아님</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CHART.JS SCRIPTS
+════════════════════════════════════════════════ -->
+<script>
+const CANVAS   = '#0b0e11';
+const CARD     = '#1e2329';
+const ELEV     = '#2b3139';
+const PRIMARY  = '#FCD535';
+const UP       = '#0ecb81';
+const DOWN     = '#f6465d';
+const BODY_C   = '#eaecef';
+const MUTED    = '#707a8a';
+
+Chart.defaults.color = MUTED;
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size   = 12;
+
+const gridOpts = { color: 'rgba(43,49,57,0.8)', drawBorder: false };
+const tooltipOpts = {
+  backgroundColor: CARD,
+  borderColor: ELEV,
+  borderWidth: 1,
+  titleColor: BODY_C,
+  bodyColor: MUTED,
+  padding: 10
+};
+
+const qs  = ['Q3 FY25', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26E'];
+const revs = [8.87, 9.91, 13.6, 23.86, 34.5];
+const eps  = [1.73, 3.03, 4.78, 12.20, 19.60];
+const gms  = [35.9, 45.1, 57.0, 75.0, 81.0];
+const yoys = [null, null, 57.0, 196.4, 289.0];
+
+function barColors(n, highlight='E') {
+  return qs.map(q => q.includes(highlight) ? PRIMARY : '#3b82f6');
+}
+
+// ── Revenue Chart ──
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: qs,
+    datasets: [{
+      data: revs,
+      backgroundColor: qs.map(q => q.includes('E') ? PRIMARY+'cc' : '#3b82f6aa'),
+      borderColor:     qs.map(q => q.includes('E') ? PRIMARY : '#3b82f6'),
+      borderWidth: 1, borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toFixed(1)}B` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}B` } }
+    }
+  }
+});
+
+// ── EPS Chart ──
+new Chart(document.getElementById('epsChart'), {
+  type: 'bar',
+  data: {
+    labels: qs,
+    datasets: [{
+      data: eps,
+      backgroundColor: qs.map(q => q.includes('E') ? PRIMARY+'cc' : UP+'99'),
+      borderColor:     qs.map(q => q.includes('E') ? PRIMARY : UP),
+      borderWidth: 1, borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toFixed(2)}` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}` } }
+    }
+  }
+});
+
+// ── GM Chart ──
+new Chart(document.getElementById('gmChart'), {
+  type: 'line',
+  data: {
+    labels: qs,
+    datasets: [{
+      data: gms,
+      borderColor: PRIMARY, backgroundColor: PRIMARY+'22',
+      pointBackgroundColor: qs.map(q => q.includes('E') ? PRIMARY : BODY_C),
+      pointRadius: 6, pointHoverRadius: 8,
+      borderWidth: 2.5, fill: true, tension: 0.3
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.parsed.y.toFixed(1)}%` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `${v}%` }, min: 0, max: 100 }
+    }
+  }
+});
+
+// ── YoY Chart ──
+new Chart(document.getElementById('yoyChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Q1 FY26', 'Q2 FY26', 'Q3 FY26E'],
+    datasets: [{
+      data: [57.0, 196.4, 289.0],
+      backgroundColor: ['#3b82f6aa', '#3b82f6aa', PRIMARY+'cc'],
+      borderColor:     ['#3b82f6', '#3b82f6', PRIMARY],
+      borderWidth: 1, borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `+${ctx.parsed.y.toFixed(1)}%` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `+${v}%` } }
+    }
+  }
+});
+
+// ── HBM Market Chart ──
+new Chart(document.getElementById('hbmChart'), {
+  type: 'line',
+  data: {
+    labels: ['2023', '2024', '2025', '2026E', '2027E', '2028E'],
+    datasets: [
+      {
+        label: '글로벌 HBM 시장 ($B)',
+        data: [2.5, 6.0, 14.0, 28.0, 50.0, 80.0],
+        borderColor: '#3b82f6', backgroundColor: '#3b82f622',
+        pointRadius: 5, borderWidth: 2.5, fill: true, tension: 0.3
+      },
+      {
+        label: '마이크론 HBM 매출 추정 ($B)',
+        data: [0.0, 0.5, 2.5, 8.0, 16.0, 28.0],
+        borderColor: UP, backgroundColor: UP+'22',
+        pointRadius: 5, borderWidth: 2.5, fill: true, tension: 0.3
+      }
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { labels: { color: BODY_C, usePointStyle: true, pointStyleWidth: 8 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: $${ctx.parsed.y}B` }, ...tooltipOpts }
+    },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}B` } }
+    }
+  }
+});
+
+// ── Guide vs Consensus Revenue ──
+new Chart(document.getElementById('guideChart'), {
+  type: 'bar',
+  data: {
+    labels: ['경영진 가이던스', '컨센서스', '자체 추정'],
+    datasets: [{
+      data: [33.5, 34.8, 34.5],
+      backgroundColor: [PRIMARY+'99', UP+'99', '#3b82f6aa'],
+      borderColor: [PRIMARY, UP, '#3b82f6'],
+      borderWidth: 1, borderRadius: 6
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toFixed(1)}B` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}B` }, min: 30, max: 38 }
+    }
+  }
+});
+
+// ── Guide vs Consensus EPS ──
+new Chart(document.getElementById('epsGuideChart'), {
+  type: 'bar',
+  data: {
+    labels: ['경영진 가이던스', '컨센서스', '자체 추정'],
+    datasets: [{
+      data: [19.15, 19.82, 19.60],
+      backgroundColor: [PRIMARY+'99', UP+'99', '#3b82f6aa'],
+      borderColor: [PRIMARY, UP, '#3b82f6'],
+      borderWidth: 1, borderRadius: 6
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toFixed(2)}` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}` }, min: 17, max: 22 }
+    }
+  }
+});
+
+// ── Annual EPS ──
+new Chart(document.getElementById('annualEpsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['FY2024', 'FY2025', 'FY2026E', 'FY2027E'],
+    datasets: [{
+      data: [1.30, 10.0, 58.0, 95.0],
+      backgroundColor: ['#3b82f6aa', '#3b82f6aa', PRIMARY+'cc', PRIMARY+'88'],
+      borderColor: ['#3b82f6', '#3b82f6', PRIMARY, PRIMARY],
+      borderWidth: 1, borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `$${ctx.parsed.y.toFixed(1)}` }, ...tooltipOpts } },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}` } }
+    }
+  }
+});
+
+// ── Cash Flow Chart ──
+new Chart(document.getElementById('cfChart'), {
+  type: 'bar',
+  data: {
+    labels: qs,
+    datasets: [
+      { label: '영업현금흐름', data: [2.5, 4.0, 6.8, 11.9, 18.0], backgroundColor: '#3b82f6aa', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 3 },
+      { label: 'CapEx',       data: [3.0, 3.5, 4.8, 5.2, 7.0],  backgroundColor: DOWN+'99',   borderColor: DOWN,     borderWidth: 1, borderRadius: 3 },
+    ]
+  },
+  options: {
+    plugins: {
+      legend: { labels: { color: BODY_C, usePointStyle: true, pointStyleWidth: 8 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: $${ctx.parsed.y.toFixed(1)}B` }, ...tooltipOpts }
+    },
+    scales: {
+      x: { grid: gridOpts },
+      y: { grid: gridOpts, ticks: { callback: v => `$${v}B` } }
+    }
+  }
+});
+</script>
+</body>
+</html>
