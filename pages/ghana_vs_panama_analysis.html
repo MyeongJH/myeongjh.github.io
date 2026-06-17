@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>가나 vs 파나마 — 2026 월드컵 조별리그 분석</title>
+<style>
+  :root{
+    --gha:#ce1126; --gha2:#fcd116; --pan:#005293; --pan2:#d21034;
+    --bg:#0d1117; --card:#161b22; --line:#222b36; --txt:#e6edf3; --mut:#8b949e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",-apple-system,"Apple SD Gothic Neo",sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:24px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{text-align:center;padding:28px 16px 8px}
+  .tag{display:inline-block;background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb55;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;letter-spacing:.5px}
+  h1{font-size:30px;margin:14px 0 6px;font-weight:800}
+  .sub{color:var(--mut);font-size:15px}
+  .vs-board{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin:28px 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 20px}
+  .team{text-align:center}
+  .crest{width:74px;height:74px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;box-shadow:0 6px 18px #0006}
+  .gha .crest{background:linear-gradient(135deg,var(--gha),var(--gha2))}
+  .pan .crest{background:linear-gradient(135deg,var(--pan),var(--pan2))}
+  .team h2{font-size:21px}
+  .rank{color:var(--mut);font-size:13px;margin-top:4px}
+  .vs{font-size:24px;font-weight:800;color:var(--mut)}
+  .vs small{display:block;font-size:11px;font-weight:600;color:#58a6ff;margin-top:6px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin:18px 0}
+  h3{font-size:19px;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  h3::before{content:"";width:5px;height:20px;background:#58a6ff;border-radius:3px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{padding:11px 10px;text-align:center;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:13px}
+  td.metric{text-align:left;color:var(--mut);font-weight:600}
+  .gha-col{color:#ff7b8a;font-weight:700}
+  .pan-col{color:#6ab0ff;font-weight:700}
+  .bar{height:9px;border-radius:5px;background:#0d1117;overflow:hidden;display:flex;margin-top:3px}
+  .bar i{display:block;height:100%}
+  .players{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .plist{list-style:none}
+  .plist li{padding:10px 0;border-bottom:1px solid var(--line)}
+  .plist .nm{font-weight:700;font-size:15px}
+  .plist .meta{color:var(--mut);font-size:12.5px}
+  .ghahead{color:#ff7b8a} .panhead{color:#6ab0ff}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px}
+  .out{background:#8b303022;color:#ff7b8a;border:1px solid #ff7b8a55}
+  .key{background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb55}
+  .reason li{margin:9px 0 9px 18px}
+  .score{text-align:center;background:linear-gradient(135deg,#161b22,#1a2330);border:1px solid #1f6feb55}
+  .scoreline{font-size:54px;font-weight:800;letter-spacing:6px;margin:10px 0}
+  .scoreline .g{color:#ff7b8a}.scoreline .p{color:#6ab0ff}
+  .alt{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:14px;color:var(--mut);font-size:14px}
+  .alt b{color:var(--txt)}
+  .note{font-size:12.5px;color:var(--mut);margin-top:8px}
+  footer{text-align:center;color:var(--mut);font-size:12px;padding:24px 0}
+  footer a{color:#58a6ff;text-decoration:none}
+  @media(max-width:680px){.players{grid-template-columns:1fr}.scoreline{font-size:42px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="tag">FIFA 월드컵 2026 · 조별리그 L조</span>
+  <h1>가나 🇬🇭 vs 파나마 🇵🇦</h1>
+  <p class="sub">2026년 6월 18일 · 토론토 BMO 필드 · 양 팀 모두 대회 첫 경기</p>
+</header>
+
+<div class="vs-board">
+  <div class="team gha">
+    <div class="crest">GHA</div>
+    <h2>가나</h2>
+    <div class="rank">FIFA 73위 · 5번째 월드컵</div>
+  </div>
+  <div class="vs">VS<small>역대 첫 맞대결</small></div>
+  <div class="team pan">
+    <div class="crest">PAN</div>
+    <h2>파나마</h2>
+    <div class="rank">FIFA 34위 · 2번째 월드컵</div>
+  </div>
+</div>
+
+<section>
+  <h3>전력 비교</h3>
+  <table>
+    <tr><th>항목</th><th class="gha-col">가나</th><th class="pan-col">파나마</th></tr>
+    <tr><td class="metric">FIFA 랭킹</td><td>73위</td><td><b>34위</b> ▲</td></tr>
+    <tr><td class="metric">월드컵 본선 경험</td><td><b>5회</b> (8강 2회)</td><td>2회 (첫 승 없음)</td></tr>
+    <tr><td class="metric">감독</td><td>카를루스 케이로스</td><td>토마스 크리스티안센</td></tr>
+    <tr><td class="metric">최근 5경기</td><td>1무 4패 (오스트리아전 0-5)</td><td>비교적 안정적</td></tr>
+    <tr><td class="metric">팀 스타일</td><td>개인 기량·역습</td><td>조직력·수비 블록</td></tr>
+    <tr><td class="metric">승리 배당(평균)</td><td><b>약 +115</b> (우세)</td><td>약 +240 (열세)</td></tr>
+  </table>
+
+  <div style="margin-top:22px">
+    <p style="font-size:13px;color:var(--mut);margin-bottom:6px">종합 전력 평가 (주관적 추정)</p>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span class="gha-col">가나 54%</span><span class="pan-col">파나마 46%</span></div>
+    <div class="bar"><i style="width:54%;background:linear-gradient(90deg,#ce1126,#fcd116)"></i><i style="width:46%;background:linear-gradient(90deg,#005293,#d21034)"></i></div>
+  </div>
+</section>
+
+<section>
+  <h3>주요 선수 비교</h3>
+  <div class="players">
+    <div>
+      <p class="ghahead" style="font-weight:700;margin-bottom:6px">🇬🇭 가나 — 개인 기량의 팀</p>
+      <ul class="plist">
+        <li><span class="nm">토마스 파티</span><span class="pill key">핵심</span><div class="meta">MF · 비야레알 · 중원의 중심·경험</div></li>
+        <li><span class="nm">앙투안 세메뇨</span><div class="meta">FW · 본머스 · 폭발적 드리블·득점력</div></li>
+        <li><span class="nm">조던 아유</span><span class="pill key">주장</span><div class="meta">FW · 풍부한 경험, 공격 리더</div></li>
+        <li><span class="nm">압둘 파타우</span><div class="meta">WG · 레스터 · 측면 스피드</div></li>
+        <li><span class="nm">어니스트 누아마</span><div class="meta">FW · 리옹 · ACL 부상 복귀</div></li>
+        <li><span class="nm">모하메드 쿠두스</span><span class="pill out">부상 결장</span><div class="meta">최대 에이스 이탈 — 공격 화력 약화</div></li>
+      </ul>
+    </div>
+    <div>
+      <p class="panhead" style="font-weight:700;margin-bottom:6px">🇵🇦 파나마 — 조직력의 팀</p>
+      <ul class="plist">
+        <li><span class="nm">아달베르토 카라스키야</span><span class="pill key">핵심</span><div class="meta">MF · UNAM · 'Coco', CONCACAF 최고 플레이메이커</div></li>
+        <li><span class="nm">아니발 고도이</span><span class="pill key">주장</span><div class="meta">MF · 159 A매치, 역대 최다 출전</div></li>
+        <li><span class="nm">호세 파하르도</span><div class="meta">FW · 예선 공동 득점왕</div></li>
+        <li><span class="nm">'푸마' 로드리게스</span><div class="meta">WG · 예선 공동 득점왕·측면 위협</div></li>
+        <li><span class="nm">세실리오 워터맨</span><div class="meta">FW · 결정력 있는 스트라이커</div></li>
+        <li><span class="nm">무리요·데이비스·에스코바르</span><div class="meta">DF · 2018 베테랑 수비 라인 + GK 메히아</div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h3>우세 예측 근거</h3>
+  <p style="margin-bottom:10px;color:var(--mut)">FIFA 랭킹은 파나마가 39계단 높지만, 시장(베팅 배당)과 전문가 다수는 <b style="color:#ff7b8a">가나의 근소 우세</b>를 점칩니다. 이유는 다음과 같습니다.</p>
+  <ul class="reason">
+    <li><b>개인 기량 차이</b> — 파티·세메뇨·아유 등 유럽 빅리그에서 뛰는 선수층이 두꺼워, 한 번의 개인 능력으로 경기를 결정지을 가능성이 높습니다.</li>
+    <li><b>본선 경험</b> — 5번째 월드컵 출전(8강 2회)으로 큰 무대 경험이 파나마(2번째, 본선 첫 승 도전)보다 앞섭니다.</li>
+    <li><b>배당의 신뢰</b> — 가나 승 +115 내외 vs 파나마 +240. 시장은 가나 쪽에 더 무게를 둡니다.</li>
+  </ul>
+  <p style="margin:14px 0 8px;color:var(--mut)">다만 다음 요소가 격차를 좁혀 <b style="color:#6ab0ff">박빙</b>을 만듭니다.</p>
+  <ul class="reason">
+    <li><b>가나의 최근 부진</b> — 직전 5경기 1무 4패, 오스트리아전 0-5 대패로 자신감·수비 불안.</li>
+    <li><b>에이스 쿠두스 결장</b> — 핵심 공격 옵션 이탈로 화력이 반감됩니다.</li>
+    <li><b>파나마의 조직력</b> — 카라스키야 중심의 짜임새와 베테랑 수비 블록은 한 골 승부에 강합니다.</li>
+  </ul>
+</section>
+
+<section class="score">
+  <h3 style="justify-content:center">예상 스코어</h3>
+  <div class="scoreline"><span class="g">1</span> : <span class="p">1</span></div>
+  <p style="color:var(--mut)">가장 유력한 결과는 <b style="color:var(--txt)">1-1 무승부</b>. 저득점의 신경전 양상으로, 가나가 초반 화력을 살리면 신승, 그렇지 못하면 비기는 그림입니다.</p>
+  <div class="alt">
+    <span>유력 ① <b>가나 1-1 파나마</b></span>
+    <span>유력 ② <b>가나 2-1 파나마</b></span>
+    <span>유력 ③ <b>가나 1-0 파나마</b></span>
+  </div>
+  <p class="note">종합 결론: <b style="color:#ff7b8a">가나 근소 우세</b>(승 확률 약 45% · 무 30% · 파나마 승 25%). 단, 가나의 폼 난조와 쿠두스 결장으로 무승부 가능성도 충분합니다.</p>
+</section>
+
+<footer>
+  데이터 출처: ESPN, Sky Sports, Goal.com, FIFA, Squawka, Olympics.com 등 (2026년 6월 기준) ·
+  베팅 배당·예측은 참고용이며 실제 결과를 보장하지 않습니다.
+</footer>
+
+</div>
+</body>
+</html>
