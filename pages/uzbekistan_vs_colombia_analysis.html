@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우즈베키스탄 vs 콜롬비아 — 2026 월드컵 조별리그 분석</title>
+<style>
+  :root{
+    --uzb:#0099b5; --uzb2:#1eb53a; --col:#fcd116; --col2:#003893;
+    --bg:#0d1117; --card:#161b22; --line:#222b36; --txt:#e6edf3; --mut:#8b949e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",-apple-system,"Apple SD Gothic Neo",sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;padding:24px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{text-align:center;padding:28px 16px 8px}
+  .tag{display:inline-block;background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb55;padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600;letter-spacing:.5px}
+  h1{font-size:30px;margin:14px 0 6px;font-weight:800}
+  .sub{color:var(--mut);font-size:15px}
+  .vs-board{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin:28px 0;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 20px}
+  .team{text-align:center}
+  .crest{width:74px;height:74px;border-radius:50%;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;box-shadow:0 6px 18px #0006}
+  .uzb .crest{background:linear-gradient(135deg,var(--uzb),var(--uzb2))}
+  .col .crest{background:linear-gradient(135deg,var(--col),var(--col2));color:#0d1117}
+  .team h2{font-size:21px}
+  .rank{color:var(--mut);font-size:13px;margin-top:4px}
+  .vs{font-size:24px;font-weight:800;color:var(--mut)}
+  .vs small{display:block;font-size:11px;font-weight:600;color:#58a6ff;margin-top:6px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin:18px 0}
+  h3{font-size:19px;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  h3::before{content:"";width:5px;height:20px;background:#58a6ff;border-radius:3px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{padding:11px 10px;text-align:center;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);font-weight:600;font-size:13px}
+  td.metric{text-align:left;color:var(--mut);font-weight:600}
+  .uzb-col{color:#3ad0e6;font-weight:700}
+  .col-col{color:#f4d35e;font-weight:700}
+  .bar{height:9px;border-radius:5px;background:#0d1117;overflow:hidden;display:flex;margin-top:3px}
+  .bar i{display:block;height:100%}
+  .players{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .plist{list-style:none}
+  .plist li{padding:10px 0;border-bottom:1px solid var(--line)}
+  .plist .nm{font-weight:700;font-size:15px}
+  .plist .meta{color:var(--mut);font-size:12.5px}
+  .uzbhead{color:#3ad0e6} .colhead{color:#f4d35e}
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px}
+  .key{background:#1f6feb22;color:#58a6ff;border:1px solid #1f6feb55}
+  .star{background:#9a6b0022;color:#f4d35e;border:1px solid #f4d35e55}
+  .reason li{margin:9px 0 9px 18px}
+  /* coach cards */
+  .coaches{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .coach{background:#0d1117;border:1px solid var(--line);border-radius:12px;padding:18px}
+  .coach h4{font-size:16px;margin-bottom:4px}
+  .coach .role{font-size:12.5px;color:var(--mut);margin-bottom:10px}
+  .coach p{font-size:13.5px;color:#c9d1d9;margin-bottom:10px}
+  .grade{display:flex;align-items:center;gap:8px;font-size:13px}
+  .stars{color:#f4d35e;letter-spacing:2px}
+  .verdict{margin-top:14px;background:#1f6feb14;border:1px solid #1f6feb44;border-radius:10px;padding:12px 14px;font-size:13.5px}
+  .verdict b{color:#58a6ff}
+  .score{text-align:center;background:linear-gradient(135deg,#161b22,#1a2330);border:1px solid #1f6feb55}
+  .scoreline{font-size:54px;font-weight:800;letter-spacing:6px;margin:10px 0}
+  .scoreline .u{color:#3ad0e6}.scoreline .c{color:#f4d35e}
+  .alt{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-top:14px;color:var(--mut);font-size:14px}
+  .alt b{color:var(--txt)}
+  .note{font-size:12.5px;color:var(--mut);margin-top:8px}
+  footer{text-align:center;color:var(--mut);font-size:12px;padding:24px 0}
+  footer a{color:#58a6ff;text-decoration:none}
+  @media(max-width:680px){.players,.coaches{grid-template-columns:1fr}.scoreline{font-size:42px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="tag">FIFA 월드컵 2026 · 조별리그 K조</span>
+  <h1>우즈베키스탄 🇺🇿 vs 콜롬비아 🇨🇴</h1>
+  <p class="sub">2026년 6월 18일 · 멕시코시티 에스타디오 아즈테카(고지대) · 양 팀 모두 대회 첫 경기</p>
+</header>
+
+<div class="vs-board">
+  <div class="team uzb">
+    <div class="crest">UZB</div>
+    <h2>우즈베키스탄</h2>
+    <div class="rank">FIFA 50위 · 사상 첫 월드컵</div>
+  </div>
+  <div class="vs">VS<small>역대 첫 맞대결</small></div>
+  <div class="team col">
+    <div class="crest">COL</div>
+    <h2>콜롬비아</h2>
+    <div class="rank">FIFA 13위 · 7번째 월드컵</div>
+  </div>
+</div>
+
+<section>
+  <h3>전력 비교</h3>
+  <table>
+    <tr><th>항목</th><th class="uzb-col">우즈베키스탄</th><th class="col-col">콜롬비아</th></tr>
+    <tr><td class="metric">FIFA 랭킹</td><td>50위</td><td><b>13위</b> ▲</td></tr>
+    <tr><td class="metric">월드컵 경험</td><td>첫 출전</td><td><b>6회</b> (8강 2회)</td></tr>
+    <tr><td class="metric">예선 성과</td><td>중앙아시아 첫 본선行</td><td>남미예선 <b>3위</b> (우루과이·브라질 상회)</td></tr>
+    <tr><td class="metric">감독</td><td>파비오 칸나바로</td><td>네스토르 로렌소</td></tr>
+    <tr><td class="metric">팀 스타일</td><td>견고한 수비 블록·역습</td><td>점유율·창의적 공격</td></tr>
+    <tr><td class="metric">승리 배당(평균)</td><td>약 +800 (열세)</td><td><b>약 -270</b> (강세)</td></tr>
+  </table>
+
+  <div style="margin-top:22px">
+    <p style="font-size:13px;color:var(--mut);margin-bottom:6px">종합 전력 평가 (주관적 추정)</p>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span class="uzb-col">우즈베키스탄 32%</span><span class="col-col">콜롬비아 68%</span></div>
+    <div class="bar"><i style="width:32%;background:linear-gradient(90deg,#0099b5,#1eb53a)"></i><i style="width:68%;background:linear-gradient(90deg,#fcd116,#003893)"></i></div>
+  </div>
+</section>
+
+<section>
+  <h3>주요 선수 비교</h3>
+  <div class="players">
+    <div>
+      <p class="uzbhead" style="font-weight:700;margin-bottom:6px">🇺🇿 우즈베키스탄 — 수비·역습의 팀</p>
+      <ul class="plist">
+        <li><span class="nm">엘도르 쇼무로도프</span><span class="pill key">주장</span><div class="meta">FW · 역대 최다 득점(92경기 44골)·팀의 상징</div></li>
+        <li><span class="nm">압두코디르 후사노프</span><span class="pill star">유망주</span><div class="meta">DF · 맨시티 · 우즈벡 최초 EPL 선수</div></li>
+        <li><span class="nm">잘롤리딘 마샤리포프</span><div class="meta">WG · 예선 4도움 · 측면 창의성</div></li>
+        <li><span class="nm">수비 블록</span><div class="meta">조직적 수비로 강팀 상대 한 골 승부 지향</div></li>
+      </ul>
+    </div>
+    <div>
+      <p class="colhead" style="font-weight:700;margin-bottom:6px">🇨🇴 콜롬비아 — 슈퍼스타의 팀</p>
+      <ul class="plist">
+        <li><span class="nm">루이스 디아스</span><span class="pill star">에이스</span><div class="meta">FW · 바이에른 뮌헨 · 시즌 26골 19도움</div></li>
+        <li><span class="nm">하메스 로드리게스</span><span class="pill key">주장</span><div class="meta">MF · 콜롬비아 월드컵 역대 최다 득점·창의력</div></li>
+        <li><span class="nm">두꺼운 미드필드</span><div class="meta">유럽파 중심의 탄탄한 중원·측면</div></li>
+        <li><span class="nm">세대교체 성공</span><div class="meta">노장+신예 조화, 28경기 무패 경험</div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h3>감독 평가</h3>
+  <div class="coaches">
+    <div class="coach">
+      <h4 class="uzbhead">파비오 칸나바로 🇮🇹</h4>
+      <div class="role">우즈베키스탄 감독 · 2006 발롱도르 수비수</div>
+      <p>선수로는 세계 최고였으나 지도자 경력은 평가가 엇갈립니다. 중국·사우디 클럽과 베네벤토 등에서 뚜렷한 성과는 부족했고, 본선 직전 부임해 <b style="color:#3ad0e6">준비 기간이 짧다</b>는 점이 약점입니다. 다만 예선 무패로 본선에 올린 카파제 감독이 닦아둔 견고한 수비 틀을 물려받았습니다.</p>
+      <div class="grade">평가 <span class="stars">★★★☆☆</span> <span style="color:var(--mut)">경험·준비 부족</span></div>
+    </div>
+    <div class="coach">
+      <h4 class="colhead">네스토르 로렌소 🇦🇷</h4>
+      <div class="role">콜롬비아 감독 · 페케르만 16년 수석코치 출신</div>
+      <p>차분한 용병술과 전술적 완성도가 강점입니다. 황금세대와 신예를 매끄럽게 융합했고, 부임 후 <b style="color:#f4d35e">28경기 무패</b>라는 기록으로 팀에 자신감을 심었습니다. 남미예선 3위(브라질·우루과이 상회)가 그의 지도력을 증명합니다.</p>
+      <div class="grade">평가 <span class="stars">★★★★★</span> <span style="color:var(--mut)">연속성·전술 우위</span></div>
+    </div>
+  </div>
+  <div class="verdict">
+    벤치 대결은 <b>로렌소(콜롬비아)의 명확한 우위</b>. 안정된 팀 빌딩과 무패 행진으로 신뢰가 높은 반면, 칸나바로는 검증이 덜 됐고 부임 시점이 늦습니다. 단, 고지대(아즈테카)와 짧은 준비라는 변수는 양 팀 모두에 작용하며, 우즈벡이 수비 조직만 유지하면 칸나바로의 '늪 축구'가 의외의 변수를 만들 여지는 있습니다.
+  </div>
+</section>
+
+<section>
+  <h3>우세 예측 근거</h3>
+  <p style="margin-bottom:10px;color:var(--mut)">랭킹·개인 기량·감독·시장 배당 모두 <b style="color:#f4d35e">콜롬비아의 분명한 우세</b>를 가리킵니다(승확률 약 70%).</p>
+  <ul class="reason">
+    <li><b>스쿼드 격차</b> — 디아스(바이에른)·하메스 등 월드클래스 선수층이 우즈벡을 크게 앞섭니다.</li>
+    <li><b>실적과 경험</b> — 남미예선 3위로 브라질·우루과이를 제쳤고, 본선 6회 출전의 노하우가 있습니다.</li>
+    <li><b>감독 신뢰도</b> — 로렌소의 28경기 무패 vs 칸나바로의 짧은 준비.</li>
+  </ul>
+  <p style="margin:14px 0 8px;color:var(--mut)">다만 다음이 콜롬비아의 '낙승'을 막을 변수입니다.</p>
+  <ul class="reason">
+    <li><b>우즈벡의 수비 조직력</b> — 후사노프(맨시티) 중심의 견고한 블록은 무실점 승부에 강합니다.</li>
+    <li><b>고지대 변수</b> — 멕시코시티 아즈테카의 고도는 점유율 축구의 템포를 떨어뜨립니다.</li>
+    <li><b>대회 첫 경기 긴장</b> — 우승후보가 아닌 콜롬비아 입장에선 신중하게 풀 가능성이 큽니다.</li>
+  </ul>
+</section>
+
+<section class="score">
+  <h3 style="justify-content:center">예상 스코어</h3>
+  <div class="scoreline"><span class="u">0</span> : <span class="c">2</span></div>
+  <p style="color:var(--mut)">가장 유력한 결과는 <b style="color:var(--txt)">콜롬비아 2-0 승</b>. 콜롬비아가 점유율을 쥐고 고지대에서 템포를 관리하며 우즈벡의 수비 블록을 결국 한두 차례 깨는 그림입니다.</p>
+  <div class="alt">
+    <span>유력 ① <b>우즈벡 0-2 콜롬비아</b></span>
+    <span>유력 ② <b>우즈벡 1-2 콜롬비아</b></span>
+    <span>유력 ③ <b>우즈벡 0-1 콜롬비아</b></span>
+  </div>
+  <p class="note">종합 결론: <b style="color:#f4d35e">콜롬비아 우세</b>(승 확률 약 70% · 무 20% · 우즈벡 승 10%). 우즈벡이 수비를 지키면 한 골 차 접전 또는 무승부 가능성도 존재합니다.</p>
+</section>
+
+<footer>
+  데이터 출처: ESPN, FIFA, Goal.com, Squawka, World Soccer Talk, CBS Sports, FOX Sports 등 (2026년 6월 기준) ·
+  베팅 배당·예측은 참고용이며 실제 결과를 보장하지 않습니다.
+</footer>
+
+</div>
+</body>
+</html>
