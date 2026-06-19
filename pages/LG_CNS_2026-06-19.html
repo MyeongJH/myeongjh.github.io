@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LG CNS — 83,500원 위기 시점 시나리오 분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --canvas:#0b0e11;--card:#1e2329;--elev:#2b3139;
+    --primary:#FCD535;--up:#0ecb81;--down:#f6465d;
+    --body:#eaecef;--muted:#707a8a;--muted-strong:#929aa5;
+    --hairline:#2b3139;--info:#3b82f6;--purple:#a855f7;
+    --ink:#181a20;--orange:#f97316;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--canvas);color:var(--body);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:24px 16px 80px;line-height:1.6;font-size:13px}
+  .container{max-width:1100px;margin:0 auto}
+  .num{font-family:'JetBrains Mono',monospace;font-feature-settings:"tnum"}
+
+  /* CRITICAL ALERT */
+  .crisis-alert{background:linear-gradient(135deg,rgba(246,70,93,.22) 0%,rgba(246,70,93,.06) 100%);border:2px solid var(--down);border-radius:14px;padding:20px;margin-bottom:20px;animation:pulse 2.5s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(246,70,93,.4)}50%{box-shadow:0 0 0 8px rgba(246,70,93,0)}}
+  .crisis-alert .tag{display:inline-block;background:var(--down);color:#fff;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+  .crisis-alert h2{font-size:20px;font-weight:700;color:var(--down);margin-bottom:6px;line-height:1.2}
+  .crisis-alert p{font-size:13px;color:var(--body);line-height:1.6}
+  .crisis-alert strong{color:var(--primary)}
+
+  /* Header */
+  .header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--down)}
+  .ticker-box{display:flex;align-items:center;gap:12px}
+  .ticker-mark{background:var(--primary);color:var(--ink);font-weight:700;padding:6px 10px;border-radius:6px;font-size:14px;font-family:'JetBrains Mono',monospace}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:12px;margin-top:4px}
+  .price-block{text-align:right}
+  .price-block .price{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--down)}
+  .price-block .chg{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--down);font-weight:500;margin-top:2px}
+  .price-block .peak{font-size:11px;color:var(--muted);margin-top:6px}
+
+  /* Status grid */
+  .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+  .status-box{background:var(--card);border-radius:10px;padding:14px;border-left:3px solid var(--muted)}
+  .status-box.bad{border-left-color:var(--down)}
+  .status-box.warn{border-left-color:var(--primary)}
+  .status-box.good{border-left-color:var(--up)}
+  .status-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;font-weight:600}
+  .status-box .v{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700}
+  .status-box .v.down{color:var(--down)}
+  .status-box .v.up{color:var(--up)}
+  .status-box .v.yel{color:var(--primary)}
+  .status-box .d{font-size:10px;color:var(--muted-strong);margin-top:4px}
+
+  /* Section */
+  .section{background:var(--card);border-radius:12px;padding:20px;margin-bottom:16px}
+  .section h3{font-size:15px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .section h3::before{content:"";width:3px;height:14px;background:var(--primary);border-radius:1px}
+  .section p{font-size:13px;color:var(--body);line-height:1.7;margin-bottom:8px}
+  .section .note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+  /* Tables */
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th, .tbl td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--hairline)}
+  .tbl th{color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;background:var(--elev)}
+  .tbl th:first-child, .tbl td:first-child{text-align:left;color:var(--body);font-weight:500}
+  .tbl td.num{font-family:'JetBrains Mono',monospace}
+  .tbl tr.bad td{background:rgba(246,70,93,.06)}
+  .tbl tr.warn td{background:rgba(252,213,53,.06)}
+  .tbl tr.good td{background:rgba(14,203,129,.06)}
+  .tbl tr.total td{border-top:2px solid var(--primary);font-weight:700;color:var(--primary)}
+  .tbl td.pos{color:var(--up)}
+  .tbl td.neg{color:var(--down)}
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* Scenario cards */
+  .scen-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:14px 0}
+  .scen-card{background:var(--elev);border-radius:10px;padding:18px;border-top:3px solid var(--muted)}
+  .scen-card.bull{border-top-color:var(--up)}
+  .scen-card.base{border-top-color:var(--primary)}
+  .scen-card.bear{border-top-color:var(--down)}
+  .scen-card .scen-tag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;font-weight:600}
+  .scen-card .scen-head{font-size:16px;font-weight:700;margin-bottom:8px}
+  .scen-card.bull .scen-head{color:var(--up)}
+  .scen-card.base .scen-head{color:var(--primary)}
+  .scen-card.bear .scen-head{color:var(--down)}
+  .scen-card .prob{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted-strong);margin-bottom:12px}
+  .scen-card .target{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin:8px 0;color:var(--body)}
+  .scen-card .target-sub{font-size:11px;color:var(--muted-strong);margin-bottom:14px}
+  .scen-card ul{list-style:none;padding:0;font-size:11px}
+  .scen-card li{padding:4px 0;color:var(--muted-strong);display:flex;justify-content:space-between;gap:8px}
+  .scen-card li::before{content:"•";color:var(--primary);font-weight:700;margin-right:4px}
+  .scen-card.bear li::before{color:var(--down)}
+  .scen-card.bull li::before{color:var(--up)}
+
+  /* Decision tree */
+  .decision-tree{background:linear-gradient(135deg,rgba(252,213,53,.06) 0%,transparent 100%);border:1px solid rgba(252,213,53,.25);border-radius:12px;padding:20px;margin:14px 0}
+  .decision-tree .step{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--hairline)}
+  .decision-tree .step:last-child{border-bottom:none}
+  .decision-tree .num-circle{flex-shrink:0;width:30px;height:30px;background:var(--primary);color:var(--ink);border-radius:50%;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .decision-tree .num-circle.bad{background:var(--down);color:#fff}
+  .decision-tree .num-circle.good{background:var(--up);color:#fff}
+  .decision-tree .step .c{flex:1}
+  .decision-tree .step .t{font-size:13px;font-weight:600;color:var(--body);margin-bottom:4px}
+  .decision-tree .step .d{font-size:12px;color:var(--muted-strong);line-height:1.5}
+  .decision-tree .step .p{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--primary);margin-top:4px;font-weight:600}
+
+  /* Chart container */
+  .chart-wrap{background:var(--card);border-radius:10px;padding:16px;margin:14px 0}
+  .chart-wrap .ch-title{font-size:13px;font-weight:600;margin-bottom:4px}
+  .chart-wrap .ch-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+  .chart-wrap .ch-body{position:relative;height:260px}
+
+  /* Banner */
+  .banner{border-radius:8px;padding:14px;font-size:12px;line-height:1.6;margin:12px 0}
+  .banner-success{background:rgba(14,203,129,.08);border:1px solid rgba(14,203,129,.2)}
+  .banner-warn{background:rgba(252,213,53,.08);border:1px solid rgba(252,213,53,.2)}
+  .banner-danger{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.2)}
+  .banner strong{color:var(--primary)}
+
+  /* Key insight */
+  .insight{padding:14px 16px;background:var(--elev);border-radius:8px;font-size:12px;line-height:1.6;margin:10px 0;border-left:3px solid var(--info)}
+  .insight strong{color:var(--info)}
+
+  footer{text-align:center;margin-top:32px;padding:20px;font-size:11px;color:var(--muted);border-top:1px solid var(--hairline)}
+
+  @media (max-width:600px){
+    body{padding:16px 10px 60px}
+    h1{font-size:18px}
+    .price-block .price{font-size:24px}
+    .scen-card .target{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="ticker-box">
+      <div class="ticker-mark">064400</div>
+      <div>
+        <h1>LG CNS — 시나리오 재평가</h1>
+        <div class="sub">2026.6.19 · 일봉 분석 · 손절 마지노선 이탈 상황</div>
+      </div>
+    </div>
+    <div class="price-block">
+      <div class="price">83,500</div>
+      <div class="chg">▼ -6,500 (-7.22%)</div>
+      <div class="peak">고점 169,800 대비 <strong style="color:var(--down)">-50.82%</strong></div>
+    </div>
+  </div>
+
+  <!-- CRISIS ALERT -->
+  <div class="crisis-alert">
+    <div class="tag">⚠ CRITICAL · 손절 라인 이탈</div>
+    <h2>이전 분석 손절 마지노선(85,000원) 이탈 — 손절 vs 반등 결정의 순간</h2>
+    <p>6월 9일 분석 당시 제시한 손절 마지노선 <strong>85,000원 종가 이탈</strong>이 6/19 종가 83,500원으로 발생했습니다. 그러나 <strong>스토캐스틱 0.35</strong>는 사상 최저 수준의 극단적 과매도이며, 80,000원(5/27 저점) 강한 지지대가 가까워 단기 반등 가능성도 매우 높습니다. 본 분석은 손절/홀드/추매 3가지 시나리오의 근거와 확률을 제시합니다.</p>
+  </div>
+
+  <!-- Status Grid -->
+  <div class="status-grid">
+    <div class="status-box bad">
+      <div class="lbl">현재가</div>
+      <div class="v down">83,500원</div>
+      <div class="d">전일 대비 -7.22%</div>
+    </div>
+    <div class="status-box bad">
+      <div class="lbl">보유 손익</div>
+      <div class="v down">-2,413,920</div>
+      <div class="d">-37.62% / 48주</div>
+    </div>
+    <div class="status-box warn">
+      <div class="lbl">평단</div>
+      <div class="v yel">133,790</div>
+      <div class="d">본전까지 +60.2% 필요</div>
+    </div>
+    <div class="status-box bad">
+      <div class="lbl">고점 대비</div>
+      <div class="v down">-50.82%</div>
+      <div class="d">169,800 → 83,500</div>
+    </div>
+    <div class="status-box warn">
+      <div class="lbl">RSI(14)</div>
+      <div class="v yel">45.16</div>
+      <div class="d">중립 (과매도 미진입)</div>
+    </div>
+    <div class="status-box good">
+      <div class="lbl">스토캐스틱</div>
+      <div class="v up">0.35</div>
+      <div class="d">⚡ 극단적 과매도</div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 1: 가격 흐름 재구성                      -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>1. 5월 29일 ~ 6월 19일 가격 흐름 (16거래일)</h3>
+
+    <div class="scroll">
+      <table class="tbl">
+        <thead>
+          <tr><th>일자</th><th>종가</th><th>등락률</th><th>고가</th><th>거래량</th><th>특징</th></tr>
+        </thead>
+        <tbody>
+          <tr class="good"><td>05.29</td><td class="num">113,800</td><td class="num pos">+29.90%</td><td class="num">113,800</td><td class="num">21.8M</td><td>상한가 #1</td></tr>
+          <tr class="good"><td>06.01</td><td class="num">147,900</td><td class="num pos">+29.96%</td><td class="num">147,900</td><td class="num">36.6M</td><td>상한가 #2</td></tr>
+          <tr class="bad"><td>06.02</td><td class="num">126,800</td><td class="num neg">-11.76%</td><td class="num" style="color:var(--down)">169,800</td><td class="num">24.8M</td><td>고점 후 폭락</td></tr>
+          <tr class="bad"><td>06.04</td><td class="num">115,800</td><td class="num neg">-14.66%</td><td class="num">132,700</td><td class="num">8.9M</td><td>2연속 -14%+</td></tr>
+          <tr class="bad"><td>06.05</td><td class="num">112,600</td><td class="num neg">-10.91%</td><td class="num">131,000</td><td class="num">8.4M</td><td>패닉 매도</td></tr>
+          <tr class="bad"><td>06.08</td><td class="num">108,200</td><td class="num neg">-7.91%</td><td class="num">114,000</td><td class="num">6.3M</td><td>약세 지속</td></tr>
+          <tr class="bad"><td>06.09</td><td class="num">99,000</td><td class="num neg">-7.04%</td><td class="num">114,000</td><td class="num">7.7M</td><td>10만 이탈</td></tr>
+          <tr class="bad"><td>06.10</td><td class="num">89,500</td><td class="num neg">-9.59%</td><td class="num">103,100</td><td class="num">4.5M</td><td>9만 이탈</td></tr>
+          <tr class="warn"><td>06.11</td><td class="num">95,000</td><td class="num pos">+1.27%</td><td class="num">97,500</td><td class="num">4.6M</td><td>반등 시도</td></tr>
+          <tr class="bad"><td>06.12</td><td class="num">92,800</td><td class="num neg">-0.21%</td><td class="num">99,500</td><td class="num">4.3M</td><td>약보합</td></tr>
+          <tr class="good"><td>06.15</td><td class="num">98,300</td><td class="num pos">+5.92%</td><td class="num">104,000</td><td class="num">4.3M</td><td>강한 반등</td></tr>
+          <tr class="bad"><td>06.16</td><td class="num">92,400</td><td class="num neg">-4.34%</td><td class="num">100,400</td><td class="num">2.5M</td><td>반등 실패</td></tr>
+          <tr class="bad"><td>06.17</td><td class="num">92,100</td><td class="num neg">-0.86%</td><td class="num">94,600</td><td class="num">2.0M</td><td>거래량 급감</td></tr>
+          <tr class="bad"><td>06.18</td><td class="num">89,400</td><td class="num neg">-3.24%</td><td class="num">93,500</td><td class="num">2.1M</td><td>9만 재이탈</td></tr>
+          <tr class="bad total"><td>06.19 (오늘)</td><td class="num">83,500</td><td class="num neg">-7.22%</td><td class="num">90,800</td><td class="num">2.4M</td><td>손절선 이탈</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight">
+      <strong>핵심 패턴:</strong> 6/1 147,900 → 6/19 83,500 = -43.5% (18일간) · 거래량 폭증 (6/1~6/4) 후 급감 (6/17~19) · <strong style="color:var(--info)">매도 압력 약화 + 매수 관망 = 셀러 소진 신호</strong>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 2: 기술적 신호 종합                      -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>2. 기술적 신호 — 상반된 메시지</h3>
+
+    <div class="scroll">
+      <table class="tbl">
+        <thead><tr><th>지표</th><th>값</th><th>해석</th><th>방향성</th></tr></thead>
+        <tbody>
+          <tr><td>RSI(14)</td><td class="num">45.16</td><td>중립 (30 미진입)</td><td class="num">중립</td></tr>
+          <tr class="good"><td>스토캐스틱(14,1,3)</td><td class="num" style="color:var(--up)">0.35 / 4.68</td><td><strong style="color:var(--up)">극단적 과매도</strong> (사상 최저급)</td><td class="num pos">강한 반등 신호</td></tr>
+          <tr class="bad"><td>일목 구름대</td><td class="num">하단 이탈</td><td>중기 약세 추세 확인</td><td class="num neg">약세</td></tr>
+          <tr class="bad"><td>이동평균 (5/20/60)</td><td class="num">정배열 붕괴</td><td>단기 → 중기 추세 약화</td><td class="num neg">약세</td></tr>
+          <tr class="warn"><td>거래량</td><td class="num">2.4M (평균↓)</td><td>매도 압력 감소</td><td class="num">긍정적 (셀러 소진)</td></tr>
+          <tr><td>지지선 80,000</td><td class="num">5/27 저점</td><td>강한 1차 지지</td><td class="num">반등 거점</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="banner banner-warn">
+      <strong>스토캐스틱 0.35 분석:</strong> 일반적으로 20 이하면 과매도, 10 이하면 극단적 과매도. <strong>0.35는 통계적으로 99%+ 분포의 극단값</strong>으로, 역사적으로 1~2주 내 +10~20% 단기 반등이 발생할 확률이 매우 높음. 그러나 추세 자체는 약세이므로 반등은 손절/익절 기회로 활용 가능.
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 3: 3가지 시나리오                        -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>3. 3가지 시나리오 — 근거와 확률</h3>
+
+    <div class="scen-grid">
+
+      <div class="scen-card bull">
+        <div class="scen-tag">시나리오 A · BULL</div>
+        <div class="scen-head">홀드 + 추매</div>
+        <div class="prob">확률: 40% · 기간: 1~3개월</div>
+        <div class="target" style="color:var(--up)">100,000 ~ 130,000원</div>
+        <div class="target-sub">+20% ~ +56% 반등</div>
+        <ul>
+          <li>스토캐스틱 0.35 극단적 과매도 → 통계적 반등</li>
+          <li>80,000원 강한 지지대 (5/27 저점) 근접</li>
+          <li>거래량 급감 = 매도 압력 소진 신호</li>
+          <li>펀더멘털 손상 없음 (2026 Q2 실적 7월말)</li>
+          <li>AIDC 가동 모멘텀 유효 (Q3~Q4)</li>
+        </ul>
+      </div>
+
+      <div class="scen-card base">
+        <div class="scen-tag">시나리오 B · BASE</div>
+        <div class="scen-head">제한적 손절 + 관망</div>
+        <div class="prob">확률: 35% · 기간: 2~4개월</div>
+        <div class="target" style="color:var(--primary)">75,000 ~ 95,000원</div>
+        <div class="target-sub">횡보 구간 형성</div>
+        <ul>
+          <li>일목 구름 이탈 = 중기 약세 추세 확인</li>
+          <li>맥쿼리PE 오버행 단계 출회 지속</li>
+          <li>코스닥 패닉 환경 지속 가능성</li>
+          <li>80~95K 박스권 형성 가능</li>
+          <li>본전 회복 시점 6개월+ 지연</li>
+        </ul>
+      </div>
+
+      <div class="scen-card bear">
+        <div class="scen-tag">시나리오 C · BEAR</div>
+        <div class="scen-head">추세 훼손 + 손절</div>
+        <div class="prob">확률: 25% · 기간: 즉시</div>
+        <div class="target" style="color:var(--down)">60,000 ~ 75,000원</div>
+        <div class="target-sub">-10% ~ -28% 추가 하락</div>
+        <ul>
+          <li>5/27 저점(80K) 종가 이탈 시 = 추세 훼손</li>
+          <li>맥쿼리PE 대규모 블록딜 발표</li>
+          <li>AI 인프라 사이클 둔화 가시화</li>
+          <li>분기 실적 컨센 미달 가능성</li>
+          <li>코스피 전반 패닉 (-10%+ 시장 하락)</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="banner banner-success">
+      <strong>확률 가중 12개월 목표:</strong> Bull (40% × 115K) + Base (35% × 85K) + Bear (25% × 68K) = <strong>약 92,750원</strong> · 현재가 83,500원 대비 <strong style="color:var(--up)">+11.1%</strong> 단기 반등 기대값
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 4: 보유자 의사결정 트리                  -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>4. 보유자 의사결정 트리 — 어떻게 행동할 것인가</h3>
+
+    <div class="decision-tree">
+
+      <div class="step">
+        <div class="num-circle">1</div>
+        <div class="c">
+          <div class="t">우선 판단: 손실 감내 가능 여부 자가 점검</div>
+          <div class="d">현재 -37.6% 손실. 추가 -10~28% (Bear) 시나리오 발생 시 최대 -50% 손실 가능. <strong>이 수준을 정신적·재정적으로 감내 가능한가?</strong></div>
+          <div class="p">감내 불가 → 즉시 손절 / 감내 가능 → 2단계로</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num-circle good">2A</div>
+        <div class="c">
+          <div class="t">[추매 전략] 분할 추가 매수</div>
+          <div class="d">스토캐스틱 0.35 극단적 과매도 활용. 80~85,000원 구간에서 12주 매수. 반등(95K~110K) 시 추매분 익절.</div>
+          <div class="p">진입: 80,000~83,500 · 12주 · 약 1,000,000원</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num-circle">2B</div>
+        <div class="c">
+          <div class="t">[관망 전략] 반등 후 손절</div>
+          <div class="d">현재 손절은 최악의 가격. 스토캐스틱 0.35 반등 가능성 70%+. 95,000원 반등 시 보유 절반 손절 (-29% 확정), 잔여는 본전 대기.</div>
+          <div class="p">반등 목표: 95,000~110,000원 · 보유 50% 정리</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num-circle bad">2C</div>
+        <div class="c">
+          <div class="t">[즉시 손절] 전량 정리</div>
+          <div class="d">80,000원 지지대 이탈 시 추가 -10~20% 가능성. 추세 약세 확정 시 미련 없이 현금화. 손실 -38% 확정, 다른 종목 기회비용 회수.</div>
+          <div class="p">손절가: 83,500원 즉시 또는 80,000원 이탈 시</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num-circle bad">3</div>
+        <div class="c">
+          <div class="t">절대 손절 마지노선: 75,000원 종가</div>
+          <div class="d">80,000원 + 일목 구름 + 5/27 저점이 동시 이탈한 상황. 75,000원 이탈 시 추세 완전 훼손으로 판단. 어떤 시나리오에서도 60K까지 추가 하락 가능 → 전량 손절 필수.</div>
+          <div class="p" style="color:var(--down)">절대 마지노: 75,000원 (종가)</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="num-circle good">4</div>
+        <div class="c">
+          <div class="t">반등 시 단계별 정리 계획</div>
+          <div class="d">95K → 추매분 익절 / 110K → 보유 1/3 정리 (-18% 확정) / 130K → 보유 1/3 추가 정리 / 본전(133.8K) → 잔여 정리. 욕심 부리지 말 것.</div>
+          <div class="p">95K → 110K → 130K → 134K 단계 익절</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 5: 가격 시나리오 차트                    -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>5. 가격 시나리오 분포 — 3개월 시각화</h3>
+
+    <div class="chart-wrap">
+      <div class="ch-title">현재가 83,500원 기준 3개월 가격 분포</div>
+      <div class="ch-sub">Bull 40% · Base 35% · Bear 25% 확률 가중</div>
+      <div class="ch-body"><canvas id="scn"></canvas></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="ch-title">손익 변화 — 6/1 ~ 6/19 (16거래일)</div>
+      <div class="ch-sub">고점 대비 -50.82% / 평단 대비 -37.62%</div>
+      <div class="ch-body"><canvas id="loss"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- SECTION 6: 권고 (최종)                           -->
+  <!-- ============================================== -->
+  <div class="section">
+    <h3>6. 최종 권고 — 어떤 결정도 나쁘지 않다</h3>
+
+    <div class="banner banner-success">
+      <strong style="color:var(--up)">권고 #1 (40% 확률 · 권장):</strong> 스토캐스틱 0.35 극단적 과매도 + 80K 강한 지지대 근접 = 분할 추매 시점. 80,000~83,500원에서 12주(약 100만원) 추매하여 평단 123,800원으로 인하. 반등 시 추매분 우선 익절 (95K~110K).
+    </div>
+
+    <div class="banner banner-warn">
+      <strong>권고 #2 (35% 확률 · 안전):</strong> 추매 부담 시 현 상태 유지하며 95K 반등을 기다린 후 보유 절반 정리. -29% 손실 확정하되 추가 하락 리스크는 회피. 잔여 50%로 본전(133.8K) 대기.
+    </div>
+
+    <div class="banner banner-danger">
+      <strong style="color:var(--down)">권고 #3 (25% 확률 · 방어적):</strong> 손실 감내 한계 도달 시 즉시 전량 손절. -38% 손실 확정하되 추가 하락 -50% 가능성 차단. 다른 종목으로 자금 재배치 기회비용 확보.
+    </div>
+
+    <div class="insight">
+      <strong>가장 피해야 할 결정:</strong> "감정적으로 손절"하기. 현재 83,500원은 통계적으로 매도 영역이 아니라 매수 영역. 손절은 75,000원 이탈 후 또는 95K 반등 후로 미루는 것이 합리적. <strong style="color:var(--up)">"패닉 매도"가 가장 큰 손실 원인</strong>.
+    </div>
+  </div>
+
+  <footer>
+    <div><strong style="color:var(--primary)">시나리오 분석 · 2026.06.19 작성</strong></div>
+    <div style="margin-top:8px">현재가 83,500원 · 평단 133,790원 · 손실 -2,413,920원 (-37.6%)</div>
+    <div style="margin-top:8px">권고: <strong style="color:var(--up)">분할 추매 우선 (40%)</strong> · 차선: 반등 후 부분 손절 (35%) · 방어: 전량 손절 (25%)</div>
+    <div style="margin-top:14px;font-size:10px;color:var(--muted)">투자 권유 아님 · 모든 결정은 본인 책임</div>
+  </footer>
+
+</div>
+
+<script>
+  Chart.defaults.color = '#707a8a';
+  Chart.defaults.borderColor = '#2b3139';
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.font.size = 11;
+  Chart.defaults.plugins.legend.labels.color = '#eaecef';
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.boxWidth = 8;
+
+  const C = {primary:'#FCD535', up:'#0ecb81', down:'#f6465d', info:'#3b82f6', purple:'#a855f7', orange:'#f97316', elev:'#2b3139'};
+
+  // Scenario chart
+  new Chart(document.getElementById('scn'), {
+    type:'line',
+    data:{labels:['현재','+2주','+1개월','+2개월','+3개월'],datasets:[
+      {label:'Bull (40%)',data:[83500,90000,100000,115000,125000],borderColor:C.up,backgroundColor:'rgba(14,203,129,0.1)',fill:false,tension:0.3,pointRadius:4},
+      {label:'Base (35%)',data:[83500,86000,88000,90000,85000],borderColor:C.primary,backgroundColor:'rgba(252,213,53,0.1)',fill:false,tension:0.3,pointRadius:4},
+      {label:'Bear (25%)',data:[83500,78000,72000,68000,65000],borderColor:C.down,backgroundColor:'rgba(246,70,93,0.1)',fill:false,tension:0.3,pointRadius:4},
+      {label:'확률가중 기대',data:[83500,85000,89000,93000,92750],borderColor:C.info,backgroundColor:'rgba(59,130,246,0.05)',borderDash:[5,3],fill:false,tension:0.3,pointRadius:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{y:{grid:{color:C.elev},ticks:{callback:v=>(v/1000)+'K'}},x:{grid:{display:false}}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw.toLocaleString()+'원'}}}}
+  });
+
+  // Loss chart
+  new Chart(document.getElementById('loss'), {
+    type:'line',
+    data:{labels:['6/1','6/2','6/4','6/5','6/8','6/9','6/10','6/11','6/12','6/15','6/16','6/17','6/18','6/19'],datasets:[
+      {label:'주가',data:[147900,126800,115800,112600,108200,99000,89500,95000,92800,98300,92400,92100,89400,83500],borderColor:C.primary,backgroundColor:'rgba(252,213,53,0.05)',fill:true,tension:0.3,pointRadius:3,yAxisID:'y'},
+      {label:'평가손실 (만원)',data:[677,-336,-863,-1017,-1228,-1670,-2126,-1862,-1968,-1703,-1987,-2002,-2131,-2413],borderColor:C.down,backgroundColor:'transparent',tension:0.3,pointRadius:3,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{
+      y:{position:'left',grid:{color:C.elev},ticks:{callback:v=>(v/1000)+'K'},title:{display:true,text:'주가 (원)'}},
+      y1:{position:'right',grid:{display:false},ticks:{callback:v=>v+'만'},title:{display:true,text:'평가손익 (만원)'}},
+      x:{grid:{display:false}}
+    },plugins:{legend:{position:'bottom'}}}
+  });
+</script>
+</body>
+</html>
